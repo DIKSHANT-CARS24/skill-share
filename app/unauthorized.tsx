@@ -1,6 +1,5 @@
-import Link from "next/link";
 import { Panel } from "@/components/ui/panel";
-import { Button } from "@/components/ui/button";
+import { SignOutButton } from "@/components/auth/sign-out-button";
 
 export default function UnauthorizedPage() {
   return (
@@ -10,17 +9,17 @@ export default function UnauthorizedPage() {
           Unauthorized
         </p>
         <h1 className="mt-3 text-[var(--font-size-heading-l)] leading-[var(--line-height-heading)] font-semibold sm:text-[var(--font-size-display-xl)]">
-          Sign in with your Cars account
+          Your account does not have access
         </h1>
         <p className="mt-4 text-[var(--font-size-body-m)] leading-[var(--line-height-body)] text-muted sm:text-[var(--font-size-body-l)]">
-          Skill Share is available only to authenticated users with approved
+          You are signed in, but Skill Share is available only to approved
           <code className="mx-1 rounded bg-surface px-2 py-0.5">@cars24.com</code>
-          access.
+          users with an active
+          <code className="mx-1 rounded bg-surface px-2 py-0.5">org_members</code>
+          record.
         </p>
         <div className="mt-6">
-          <Button asChild>
-            <Link href="/login">Go to login</Link>
-          </Button>
+          <SignOutButton />
         </div>
       </Panel>
     </main>

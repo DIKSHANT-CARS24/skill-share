@@ -1,17 +1,22 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { DEFAULT_SIGN_IN_REDIRECT_PATH } from "@/lib/auth-utils";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 
-export function LoginForm() {
+export function LoginForm({
+  next = DEFAULT_SIGN_IN_REDIRECT_PATH,
+}: {
+  next?: string;
+}) {
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
 
   function handleGoogleSignIn() {
     startTransition(async () => {
       const supabase = createClient();
-      const redirectTo = `${window.location.origin}/auth/callback?next=/skills`;
+      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {

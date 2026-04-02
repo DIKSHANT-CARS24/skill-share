@@ -1,4 +1,4 @@
-import { forbidden, redirect, unauthorized } from "next/navigation";
+import { redirect, unauthorized } from "next/navigation";
 import type { JwtPayload, SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -143,15 +143,11 @@ export async function requireActiveMember() {
   const context = await getOptionalMemberContext();
 
   if (!context) {
+    redirect("/login");
+  }
+
+  if (context.access !== "granted") {
     unauthorized();
-  }
-
-  if (context.access === "invalid-domain") {
-    redirect("/login?error=Only%20%40cars24.com%20email%20addresses%20may%20access%20Skill%20Share.");
-  }
-
-  if (context.access === "missing-member" || context.access === "inactive-member") {
-    forbidden();
   }
 
   return context satisfies AuthenticatedMemberContext;
@@ -161,7 +157,7 @@ export async function requireAdmin() {
   const context = await requireActiveMember();
 
   if (context.member.role !== "admin") {
-    forbidden();
+    unauthorized();
   }
 
   return context;

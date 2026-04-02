@@ -4,6 +4,10 @@ export function isCarsEmail(email: string) {
   return email.trim().toLowerCase().endsWith("@cars24.com");
 }
 
+export function isPublicPath(pathname: string) {
+  return pathname === "/login" || pathname === "/auth/callback";
+}
+
 export function getSafeNextPath(
   candidate: string | null | undefined,
   fallback = DEFAULT_SIGN_IN_REDIRECT_PATH,
@@ -21,6 +25,16 @@ export function getSafeNextPath(
   } catch {
     return fallback;
   }
+}
+
+export function buildLoginRedirectPath(pathname: string, search = "") {
+  const nextPath = `${pathname}${search}`;
+
+  if (nextPath === "/") {
+    return "/login";
+  }
+
+  return `/login?next=${encodeURIComponent(nextPath)}`;
 }
 
 export function getDisplayNameFromEmail(email: string) {

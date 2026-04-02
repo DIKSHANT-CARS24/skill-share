@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { getOptionalMemberContext } from "@/lib/auth";
+import { getOptionalMemberContext, getSafeNextPath } from "@/lib/auth";
 import { LoginForm } from "@/components/auth/login-form";
 import { LoginGradientPanel } from "@/components/auth/login-gradient-panel";
 import { Panel } from "@/components/ui/panel";
@@ -17,9 +17,10 @@ export default async function LoginPage({
   const params = await searchParams;
   const context = await getOptionalMemberContext();
   const error = typeof params.error === "string" ? params.error : "";
+  const next = getSafeNextPath(typeof params.next === "string" ? params.next : undefined);
 
-  if (context?.access === "granted") {
-    redirect("/skills");
+  if (context) {
+    redirect(context.access === "granted" ? next : "/unauthorized");
   }
 
   return (
@@ -50,7 +51,7 @@ export default async function LoginPage({
             ) : null}
 
             <div className="w-full">
-              <LoginForm />
+              <LoginForm next={next} />
             </div>
           </div>
         </Panel>

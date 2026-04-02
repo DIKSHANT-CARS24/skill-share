@@ -1,5 +1,16 @@
 import { redirect } from "next/navigation";
+import { getOptionalMemberContext } from "@/lib/auth";
 
-export default function Home() {
-  redirect("/skills");
+export default async function Home() {
+  const context = await getOptionalMemberContext();
+
+  if (!context) {
+    redirect("/login");
+  }
+
+  if (context.access === "granted") {
+    redirect("/skills");
+  }
+
+  redirect("/unauthorized");
 }

@@ -29,11 +29,7 @@ export async function GET(request: NextRequest) {
   const email = data.user?.email?.trim().toLowerCase() ?? "";
 
   if (!isCarsEmail(email)) {
-    await supabase.auth.signOut();
-    return buildRedirect(
-      request,
-      "/login?error=Only%20%40cars24.com%20email%20addresses%20may%20access%20Skill%20Share.",
-    );
+    return buildRedirect(request, "/unauthorized");
   }
 
   const userId = data.user?.id;
@@ -46,19 +42,11 @@ export async function GET(request: NextRequest) {
   const member = await ensureOrgMemberRow(supabase, userId, email);
 
   if (!member) {
-    await supabase.auth.signOut();
-    return buildRedirect(
-      request,
-      "/login?error=Your%20account%20could%20not%20be%20added%20to%20org_members.%20Ask%20an%20admin%20for%20help.",
-    );
+    return buildRedirect(request, "/unauthorized");
   }
 
   if (!member.is_active) {
-    await supabase.auth.signOut();
-    return buildRedirect(
-      request,
-      "/login?error=Your%20org_members%20row%20is%20inactive.%20Ask%20an%20admin%20to%20restore%20access.",
-    );
+    return buildRedirect(request, "/unauthorized");
   }
 
   return buildRedirect(request, next);

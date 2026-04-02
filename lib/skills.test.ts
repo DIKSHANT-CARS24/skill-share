@@ -143,8 +143,18 @@ test("getSkillsForCatalog matches spelling variants and category text fuzzily", 
     sort: "newest",
   });
 
-  const categoryResults = getSkillsForCatalog(skills, {
-    search: "developmnt",
+  const skillsWithCategoryNames = skills.map((skill) => ({
+    ...skill,
+    categoryName:
+      skill.id === "incident-triage-brief"
+        ? "Engineering"
+        : skill.id === "customer-thread-summarizer"
+          ? "Customer Support"
+          : "Operations",
+  }));
+
+  const categoryResults = getSkillsForCatalog(skillsWithCategoryNames, {
+    search: "engineerng",
     category: "",
     uploader: "",
     sort: "newest",

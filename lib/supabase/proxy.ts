@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { buildLoginRedirectPath, isPublicPath } from "@/lib/auth-utils";
 
 function getPublicEnv(name: "NEXT_PUBLIC_SUPABASE_URL" | "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY") {
   const value = process.env[name];
@@ -41,7 +42,35 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  await supabase.auth.getClaims();
+  const { data } = await supabase.auth.getClaims();
+  const claims = data?.claims ?? null;
+
+  const pathname = request.nextUrl.pathname;
+
+  if (isPublicPath(pathname)) {
+    return response;
+  }
+
+  const isAuthenticated = Boolean(claims?.sub);
+
+  if ((pathname === "/unauthorized" || pathname === "/forbidden") && !isAuthenticated) {
+    return redirectWithCookies(response, request, "/login");
+  }
+
+  if (!isAuthenticated) {
+    const loginPath = buildLoginRedirectPath(pathname, request.nextUrl.search);
+    return redirectWithCookies(response, request, loginPath);
+  }
 
   return response;
+}
+
+function redirectWithCookies(response: NextResponse, request: NextRequest, pathname: string) {
+  const redirectResponse = NextResponse.redirect(new URL(pathname, request.url));
+
+  response.cookies.getAll().forEach((cookie) => {
+    redirectResponse.cookies.set(cookie);
+  });
+
+  return redirectResponse;
 }
