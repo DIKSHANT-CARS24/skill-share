@@ -1,4 +1,3 @@
-import { unauthorized } from "next/navigation";
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { ensureOrgMemberRow } from "@/lib/auth";
@@ -6,6 +5,12 @@ import { getSafeNextPath, isCarsEmail } from "@/lib/auth-utils";
 
 function buildRedirect(request: NextRequest, path: string) {
   return NextResponse.redirect(new URL(path, request.url));
+}
+
+async function rejectAccess(request: NextRequest, reason: string) {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  return buildRedirect(request, `/unauthorized?reason=${encodeURIComponent(reason)}`);
 }
 
 export async function GET(request: NextRequest) {
@@ -30,7 +35,8 @@ export async function GET(request: NextRequest) {
   const email = data.user?.email?.trim().toLowerCase() ?? "";
 
   if (!isCarsEmail(email)) {
-    unauthorized();
+    await supabase.auth.signOut();
+    return buildRedirect(request, "/unauthorized?reason=domain");
   }
 
   const userId = data.user?.id;
@@ -43,11 +49,11 @@ export async function GET(request: NextRequest) {
   const member = await ensureOrgMemberRow(supabase, userId, email);
 
   if (!member) {
-    unauthorized();
+    return rejectAccess(request, "missing-member");
   }
 
   if (!member.is_active) {
-    unauthorized();
+    return rejectAccess(request, "inactive-member");
   }
 
   return buildRedirect(request, next);

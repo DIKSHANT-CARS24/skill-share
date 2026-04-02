@@ -5,7 +5,12 @@ export function isCarsEmail(email: string) {
 }
 
 export function isPublicPath(pathname: string) {
-  return pathname === "/login" || pathname === "/auth/callback";
+  return (
+    pathname === "/login" ||
+    pathname === "/auth/callback" ||
+    pathname === "/unauthorized" ||
+    pathname === "/forbidden"
+  );
 }
 
 export function getSafeNextPath(

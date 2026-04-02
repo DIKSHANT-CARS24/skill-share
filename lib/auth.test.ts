@@ -23,11 +23,12 @@ test("getSafeNextPath keeps only internal callback destinations", () => {
   assert.equal(getSafeNextPath("admin"), DEFAULT_SIGN_IN_REDIRECT_PATH);
 });
 
-test("isPublicPath keeps login and callback public", () => {
+test("isPublicPath keeps auth and access-status routes public", () => {
   assert.equal(isPublicPath("/login"), true);
   assert.equal(isPublicPath("/auth/callback"), true);
+  assert.equal(isPublicPath("/unauthorized"), true);
+  assert.equal(isPublicPath("/forbidden"), true);
   assert.equal(isPublicPath("/skills"), false);
-  assert.equal(isPublicPath("/unauthorized"), false);
 });
 
 test("buildLoginRedirectPath only adds next when needed", () => {
