@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+:root {
+  --surface-brand-primary: #4736fe;
+  --surface-brand-secondary: #e3e1ff;
+  --surface-brand-subtle: #f6f5ff;
+  --surface-default-strong: #f1f5f9;
+  --surface-default-subtle: #f8fafc;
+  --surface-elevated: #ffffff;
+  --text-primary: #0f172b;
+  --text-secondary: #62748e;
+  --text-brand-primary: #4736fe;
+  --text-inverse: #ffffff;
+  --border-primary: #90a1b9;
+  --border-secondary: #cad5e2;
+  --border-brand-primary: #4736fe;
+  --feedback-success-surface: #effff7;
+  --feedback-warning-surface: #fffbeb;
+  --feedback-error-surface: #fef2f2;
+  --badge-neutral-subtle-surface: #f8fafc;
+  --badge-neutral-subtle-text: #475569;
+  --badge-neutral-solid-surface: #0f172b;
+  --badge-neutral-stroke-surface: #f1f5f9;
+  --badge-information-subtle-surface: #f6f5ff;
+  --badge-information-text: #4736fe;
+  --badge-information-stroke-border: #c6c1ff;
+  --badge-success-text: #368c61;
+  --badge-success-solid-surface: #00a63e;
+  --badge-warning-text: #e17100;
+  --badge-warning-solid-surface: #fd9a00;
+  --badge-error-text: #c10007;
+  --badge-error-solid-surface: #c10007;
+  --badge-feature-surface: #fbe6fe;
+  --badge-sky-surface: #ebfeff;
+  --badge-drive-surface: #ffe8f7;
+  --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --card-gap: 16px;
+
+  --background: var(--surface-default-subtle);
+  --background-strong: var(--surface-default-strong);
+  --foreground: var(--text-primary);
+  --surface: var(--surface-default-strong);
+  --surface-strong: var(--surface-elevated);
+  --surface-muted: var(--surface-brand-subtle);
+  --border: var(--border-secondary);
+  --border-strong: var(--border-primary);
+  --muted: var(--text-secondary);
+  --muted-strong: var(--text-primary);
+  --accent: var(--surface-brand-primary);
+  --accent-strong: color-mix(in srgb, var(--surface-brand-primary) 82%, var(--text-primary));
+  --accent-soft: var(--surface-brand-secondary);
+  --success: #166534;
+  --success-soft: var(--feedback-success-surface);
+  --warning: #92400e;
+  --warning-soft: var(--feedback-warning-surface);
+  --danger: #b42318;
+  --danger-soft: var(--feedback-error-surface);
+  --shadow: rgba(15, 23, 43, 0.08);
+
+  --font-sans-family:
+    "Inter",
+    "Aptos",
+    "Segoe UI Variable",
+    "Segoe UI",
+    Arial,
+    sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+  --font-size-display-xl: 3rem;
+  --font-size-heading-l: 2rem;
+  --font-size-heading-m: 1.5rem;
+  --font-size-title-m: 1.25rem;
+  --font-size-body-l: 1.0625rem;
+  --font-size-body-m: 0.9375rem;
+  --font-size-body-s: 0.8125rem;
+  --font-size-label-m: 0.9375rem;
+  --font-size-label-s: 0.8125rem;
+  --font-size-caption-xs: 0.6875rem;
+  --line-height-heading: 1.25;
+  --line-height-body: 1.4;
+}
+
+@theme inline {
+  --font-sans: var(--font-sans-family);
+  --color-background: var(--background);
+  --color-background-strong: var(--background-strong);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-strong: var(--surface-strong);
+  --color-surface-brand-primary: var(--surface-brand-primary);
+  --color-surface-brand-secondary: var(--surface-brand-secondary);
+  --color-surface-brand-subtle: var(--surface-brand-subtle);
+  --color-surface-default-strong: var(--surface-default-strong);
+  --color-surface-default-subtle: var(--surface-default-subtle);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-border-brand-primary: var(--border-brand-primary);
+  --color-muted: var(--muted);
+  --color-muted-strong: var(--muted-strong);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-feedback-success-surface: var(--feedback-success-surface);
+  --color-feedback-warning-surface: var(--feedback-warning-surface);
+  --color-feedback-error-surface: var(--feedback-error-surface);
+  --color-badge-neutral-subtle-surface: var(--badge-neutral-subtle-surface);
+  --color-badge-neutral-subtle-text: var(--badge-neutral-subtle-text);
+  --color-badge-neutral-solid-surface: var(--badge-neutral-solid-surface);
+  --color-badge-neutral-stroke-surface: var(--badge-neutral-stroke-surface);
+  --color-badge-information-subtle-surface: var(--badge-information-subtle-surface);
+  --color-badge-information-text: var(--badge-information-text);
+  --color-badge-information-stroke-border: var(--badge-information-stroke-border);
+  --color-badge-success-text: var(--badge-success-text);
+  --color-badge-success-solid-surface: var(--badge-success-solid-surface);
+  --color-badge-warning-text: var(--badge-warning-text);
+  --color-badge-warning-solid-surface: var(--badge-warning-solid-surface);
+  --color-badge-error-text: var(--badge-error-text);
+  --color-badge-error-solid-surface: var(--badge-error-solid-surface);
+  --color-badge-feature-surface: var(--badge-feature-surface);
+  --color-badge-sky-surface: var(--badge-sky-surface);
+  --color-badge-drive-surface: var(--badge-drive-surface);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans-family);
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--surface-brand-primary) 12%, transparent), transparent 26%),
+    radial-gradient(circle at top right, color-mix(in srgb, var(--surface-brand-secondary) 55%, transparent), transparent 22%),
+    var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans-family);
+  font-size: var(--font-size-body-m);
+  line-height: var(--line-height-body);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: color-mix(in srgb, var(--muted) 84%, white);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 18%, white);
+}
