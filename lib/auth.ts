@@ -6,6 +6,7 @@ import {
   getInitialsFromEmail,
   getSafeNextPath,
   isCarsEmail,
+  isSkillOwner,
   DEFAULT_SIGN_IN_REDIRECT_PATH,
 } from "@/lib/auth-utils";
 
@@ -32,6 +33,7 @@ export {
   getInitialsFromEmail,
   getSafeNextPath,
   isCarsEmail,
+  isSkillOwner,
   DEFAULT_SIGN_IN_REDIRECT_PATH,
 };
 

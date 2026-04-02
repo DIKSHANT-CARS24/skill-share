@@ -12,6 +12,7 @@ export default function UnauthorizedPage() {
           Your account does not have access
         </h1>
         <p className="mt-4 text-[var(--font-size-body-m)] leading-[var(--line-height-body)] text-muted sm:text-[var(--font-size-body-l)]">
+          Sign in with your Cars24 account.{" "}
           You are signed in, but Skill Share is available only to approved
           <code className="mx-1 rounded bg-surface px-2 py-0.5">@cars24.com</code>
           users with an active

@@ -3,7 +3,7 @@
 import { randomUUID } from "node:crypto";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { requireActiveMember } from "@/lib/auth";
+import { isSkillOwner, requireActiveMember } from "@/lib/auth";
 import {
   getCanonicalCategoryFromRow,
   normalizeCategoryValue,
@@ -619,8 +619,7 @@ export async function updateSkill(
     return createResponse("This skill could not be found for editing.", [], fieldValues);
   }
 
-  const canEdit =
-    existingSkill.uploader_id === context.member.user_id || context.member.role === "admin";
+  const canEdit = isSkillOwner(context.member.user_id, existingSkill.uploader_id);
 
   if (!canEdit) {
     return createResponse("You do not have permission to edit this skill.", [], fieldValues);
@@ -933,8 +932,7 @@ export async function deleteSkill(
     return createResponse("This skill could not be found for deletion.");
   }
 
-  const canDelete =
-    existingSkill.uploader_id === context.member.user_id || context.member.role === "admin";
+  const canDelete = isSkillOwner(context.member.user_id, existingSkill.uploader_id);
 
   if (!canDelete) {
     return createResponse("You do not have permission to delete this skill.");

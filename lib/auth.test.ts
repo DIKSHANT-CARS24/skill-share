@@ -6,6 +6,7 @@ import {
   getSafeNextPath,
   isCarsEmail,
   isPublicPath,
+  isSkillOwner,
 } from "./auth-utils.ts";
 
 test("isCarsEmail only allows cars24.com addresses", () => {
@@ -35,4 +36,10 @@ test("buildLoginRedirectPath only adds next when needed", () => {
     buildLoginRedirectPath("/skills/intro-to-prompts", "?tab=versions"),
     "/login?next=%2Fskills%2Fintro-to-prompts%3Ftab%3Dversions",
   );
+});
+
+test("isSkillOwner only allows the uploader to edit", () => {
+  assert.equal(isSkillOwner("member-123", "member-123"), true);
+  assert.equal(isSkillOwner("admin-456", "member-123"), false);
+  assert.equal(isSkillOwner("member-456", "member-123"), false);
 });

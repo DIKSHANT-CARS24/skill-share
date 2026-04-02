@@ -37,6 +37,10 @@ export function buildLoginRedirectPath(pathname: string, search = "") {
   return `/login?next=${encodeURIComponent(nextPath)}`;
 }
 
+export function isSkillOwner(viewerUserId: string, skillUploaderId: string) {
+  return viewerUserId === skillUploaderId;
+}
+
 export function getDisplayNameFromEmail(email: string) {
   const localPart = email.split("@")[0] ?? "";
 

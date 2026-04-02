@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireActiveMember, getInitialsFromEmail } from "@/lib/auth";
+import { requireActiveMember, getInitialsFromEmail, isSkillOwner } from "@/lib/auth";
 import { getSkillDetailBySlug } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,7 @@ export default async function SkillDetailPage({
 
   const { skill, category, uploader } = detail;
   const status = getStatusMeta(skill.status);
+  const canEditSkill = isSkillOwner(context.member.user_id, skill.uploaderId);
 
   return (
     <div className="space-y-5 pb-6">
@@ -64,9 +65,11 @@ export default async function SkillDetailPage({
                 Download .md
               </Link>
             </Button>
-            <Button asChild variant="accentSecondary" className="w-full sm:w-auto">
-              <Link href={`/skills/${skill.slug ?? skill.id}/edit`}>Edit skill</Link>
-            </Button>
+            {canEditSkill ? (
+              <Button asChild variant="accentSecondary" className="w-full sm:w-auto">
+                <Link href={`/skills/${skill.slug ?? skill.id}/edit`}>Edit skill</Link>
+              </Button>
+            ) : null}
           </div>
         </div>
       </Panel>

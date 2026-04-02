@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, unauthorized } from "next/navigation";
 import { UploadForm } from "@/components/upload/upload-form";
-import { requireActiveMember } from "@/lib/auth";
+import { isSkillOwner, requireActiveMember } from "@/lib/auth";
 import { getSkillDetailBySlug, listCategories } from "@/lib/data";
 
 export const metadata: Metadata = {
@@ -24,8 +24,9 @@ export default async function EditSkillPage({
     notFound();
   }
 
-  const canDeleteSkill =
-    detail.skill.uploaderId === context.member.user_id || context.member.role === "admin";
+  if (!isSkillOwner(context.member.user_id, detail.skill.uploaderId)) {
+    unauthorized();
+  }
 
   return (
     <div className="pb-6">
@@ -33,7 +34,7 @@ export default async function EditSkillPage({
         categories={categories}
         uploaderEmail={context.member.email}
         mode="edit"
-        canDeleteSkill={canDeleteSkill}
+        canDeleteSkill
         editSkill={{
           id: detail.skill.id,
           slug: detail.skill.slug ?? detail.skill.id,
