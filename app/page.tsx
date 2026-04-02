@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { redirect, unauthorized } from "next/navigation";
 import { getOptionalMemberContext } from "@/lib/auth";
 
 export default async function Home() {
@@ -12,5 +12,5 @@ export default async function Home() {
     redirect("/skills");
   }
 
-  redirect("/unauthorized");
+  unauthorized();
 }

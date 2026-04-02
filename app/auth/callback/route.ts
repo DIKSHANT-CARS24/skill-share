@@ -1,3 +1,4 @@
+import { unauthorized } from "next/navigation";
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { ensureOrgMemberRow } from "@/lib/auth";
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest) {
   const email = data.user?.email?.trim().toLowerCase() ?? "";
 
   if (!isCarsEmail(email)) {
-    return buildRedirect(request, "/unauthorized");
+    unauthorized();
   }
 
   const userId = data.user?.id;
@@ -42,11 +43,11 @@ export async function GET(request: NextRequest) {
   const member = await ensureOrgMemberRow(supabase, userId, email);
 
   if (!member) {
-    return buildRedirect(request, "/unauthorized");
+    unauthorized();
   }
 
   if (!member.is_active) {
-    return buildRedirect(request, "/unauthorized");
+    unauthorized();
   }
 
   return buildRedirect(request, next);

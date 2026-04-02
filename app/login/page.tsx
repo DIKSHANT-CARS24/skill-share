@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import { redirect, unauthorized } from "next/navigation";
 import { getOptionalMemberContext, getSafeNextPath } from "@/lib/auth";
 import { LoginForm } from "@/components/auth/login-form";
 import { LoginGradientPanel } from "@/components/auth/login-gradient-panel";
@@ -20,7 +20,11 @@ export default async function LoginPage({
   const next = getSafeNextPath(typeof params.next === "string" ? params.next : undefined);
 
   if (context) {
-    redirect(context.access === "granted" ? next : "/unauthorized");
+    if (context.access === "granted") {
+      redirect(next);
+    }
+
+    unauthorized();
   }
 
   return (

@@ -53,10 +53,6 @@ export async function updateSession(request: NextRequest) {
 
   const isAuthenticated = Boolean(claims?.sub);
 
-  if ((pathname === "/unauthorized" || pathname === "/forbidden") && !isAuthenticated) {
-    return redirectWithCookies(response, request, "/login");
-  }
-
   if (!isAuthenticated) {
     const loginPath = buildLoginRedirectPath(pathname, request.nextUrl.search);
     return redirectWithCookies(response, request, loginPath);
