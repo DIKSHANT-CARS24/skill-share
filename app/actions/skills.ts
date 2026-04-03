@@ -11,7 +11,10 @@ import {
 } from "@/lib/category-taxonomy";
 import type { UploadFormState } from "@/lib/upload-form-state";
 import type { UploadDraft } from "@/lib/types";
-import { isMarkdownFileName } from "@/lib/upload-utils";
+import {
+  getMarkdownUploadContentType,
+  isSupportedMarkdownUpload,
+} from "@/lib/upload-utils";
 
 type EditableSkillRecord = {
   id: string;
@@ -154,7 +157,7 @@ function validateSkillFields({
 
   if (requireMarkdownFile && !hasMarkdownFile) {
     errors.push("Select a markdown file.");
-  } else if (hasMarkdownFile && !isMarkdownFileName(markdownFile.name)) {
+  } else if (hasMarkdownFile && !isSupportedMarkdownUpload(markdownFile.name, markdownFile.type)) {
     errors.push("Only .md files are supported.");
   }
 
@@ -494,7 +497,7 @@ export async function uploadSkill(
     storagePath,
     fileToUpload,
     {
-      contentType: fileToUpload.type || "text/markdown",
+      contentType: getMarkdownUploadContentType(),
       upsert: false,
     },
   );
@@ -730,7 +733,7 @@ export async function updateSkill(
       uploadedStoragePath,
       fileToUpload,
       {
-        contentType: fileToUpload.type || "text/markdown",
+        contentType: getMarkdownUploadContentType(),
         upsert: !versionChanged,
       },
     );

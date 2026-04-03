@@ -2,8 +2,30 @@ import type { MarkdownBlock, UploadDraft } from "./types.ts";
 
 export type UploadPhase = "idle" | "uploading" | "complete";
 
+const acceptedMarkdownMimeTypes = new Set([
+  "",
+  "application/octet-stream",
+  "text/markdown",
+  "text/plain",
+]);
+
 export function isMarkdownFileName(fileName: string) {
   return /\.md$/i.test(fileName.trim());
+}
+
+export function isAcceptedMarkdownMimeType(fileType: string | null | undefined) {
+  return acceptedMarkdownMimeTypes.has((fileType ?? "").trim().toLowerCase());
+}
+
+export function isSupportedMarkdownUpload(
+  fileName: string,
+  fileType: string | null | undefined,
+) {
+  return isMarkdownFileName(fileName) && isAcceptedMarkdownMimeType(fileType);
+}
+
+export function getMarkdownUploadContentType() {
+  return "text/markdown";
 }
 
 export function validateUploadDraft(draft: UploadDraft) {

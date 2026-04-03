@@ -1,11 +1,36 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { isMarkdownFileName, markdownToBlocks, validateUploadDraft } from "./upload-utils.ts";
+import {
+  getMarkdownUploadContentType,
+  isAcceptedMarkdownMimeType,
+  isMarkdownFileName,
+  isSupportedMarkdownUpload,
+  markdownToBlocks,
+  validateUploadDraft,
+} from "./upload-utils.ts";
 
 test("isMarkdownFileName only accepts markdown files", () => {
   assert.equal(isMarkdownFileName("skill.md"), true);
   assert.equal(isMarkdownFileName("skill.MD"), true);
   assert.equal(isMarkdownFileName("skill.txt"), false);
+});
+
+test("markdown upload accepts common browser MIME variants", () => {
+  assert.equal(isAcceptedMarkdownMimeType("text/markdown"), true);
+  assert.equal(isAcceptedMarkdownMimeType("text/plain"), true);
+  assert.equal(isAcceptedMarkdownMimeType("application/octet-stream"), true);
+  assert.equal(isAcceptedMarkdownMimeType(""), true);
+  assert.equal(isAcceptedMarkdownMimeType(undefined), true);
+  assert.equal(isAcceptedMarkdownMimeType("application/pdf"), false);
+
+  assert.equal(isSupportedMarkdownUpload("skill.md", "text/markdown"), true);
+  assert.equal(isSupportedMarkdownUpload("skill.md", "text/plain"), true);
+  assert.equal(isSupportedMarkdownUpload("skill.md", "application/octet-stream"), true);
+  assert.equal(isSupportedMarkdownUpload("skill.md", ""), true);
+  assert.equal(isSupportedMarkdownUpload("skill.md", undefined), true);
+  assert.equal(isSupportedMarkdownUpload("skill.md", "application/pdf"), false);
+  assert.equal(isSupportedMarkdownUpload("skill.txt", "text/markdown"), false);
+  assert.equal(getMarkdownUploadContentType(), "text/markdown");
 });
 
 test("validateUploadDraft returns actionable validation messages", () => {

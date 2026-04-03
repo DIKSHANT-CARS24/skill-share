@@ -13,7 +13,7 @@ import {
   type UploadFormState,
 } from "@/lib/upload-form-state";
 import type { Category, MarkdownBlock, UploadDraft, UploadFormMode } from "@/lib/types";
-import { markdownToBlocks } from "@/lib/upload-utils";
+import { isSupportedMarkdownUpload, markdownToBlocks } from "@/lib/upload-utils";
 
 interface UploadFormProps {
   categories: Category[];
@@ -155,7 +155,7 @@ function UploadFormContent({
       return;
     }
 
-    if (!file.name.toLowerCase().endsWith(".md")) {
+    if (!isSupportedMarkdownUpload(file.name, file.type)) {
       setClientFileError("Only .md files are supported.");
       setDraft((current) => ({ ...current, fileName: "" }));
       setPreviewBlocks(initialPreviewBlocks);
@@ -289,7 +289,7 @@ function UploadFormContent({
                 <input
                   name="markdown"
                   type="file"
-                  accept=".md,text/markdown"
+                  accept=".md,text/markdown,text/plain,application/octet-stream"
                   aria-label="Markdown file"
                   onChange={handleFileChange}
                   className="block w-full text-[var(--font-size-body-m)] leading-[var(--line-height-body)] text-muted file:mr-4 file:rounded-xl file:border-0 file:bg-accent file:px-4 file:py-2 file:text-[var(--font-size-label-m)] file:leading-[var(--line-height-body)] file:font-semibold file:text-white hover:file:bg-accent-strong"
