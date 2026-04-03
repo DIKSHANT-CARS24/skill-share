@@ -28,6 +28,19 @@ export function getMarkdownUploadContentType() {
   return "text/markdown";
 }
 
+export function normalizeMarkdownUploadFile(file: File) {
+  return new File([file], file.name, {
+    type: getMarkdownUploadContentType(),
+    lastModified: file.lastModified,
+  });
+}
+
+export function normalizeMarkdownUploadBlob(blob: Blob) {
+  return new Blob([blob], {
+    type: getMarkdownUploadContentType(),
+  });
+}
+
 export function validateUploadDraft(draft: UploadDraft) {
   const errors: string[] = [];
 

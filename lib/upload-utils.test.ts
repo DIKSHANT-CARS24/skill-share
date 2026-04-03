@@ -5,6 +5,8 @@ import {
   isAcceptedMarkdownMimeType,
   isMarkdownFileName,
   isSupportedMarkdownUpload,
+  normalizeMarkdownUploadBlob,
+  normalizeMarkdownUploadFile,
   markdownToBlocks,
   validateUploadDraft,
 } from "./upload-utils.ts";
@@ -31,6 +33,18 @@ test("markdown upload accepts common browser MIME variants", () => {
   assert.equal(isSupportedMarkdownUpload("skill.md", "application/pdf"), false);
   assert.equal(isSupportedMarkdownUpload("skill.txt", "text/markdown"), false);
   assert.equal(getMarkdownUploadContentType(), "text/markdown");
+
+  const sourceFile = new File(["# Heading"], "skill.md", {
+    type: "application/octet-stream",
+    lastModified: 123,
+  });
+  const normalizedFile = normalizeMarkdownUploadFile(sourceFile);
+  const normalizedBlob = normalizeMarkdownUploadBlob(sourceFile);
+
+  assert.equal(normalizedFile.name, "skill.md");
+  assert.equal(normalizedFile.type, "text/markdown");
+  assert.equal(normalizedFile.lastModified, 123);
+  assert.equal(normalizedBlob.type, "text/markdown");
 });
 
 test("validateUploadDraft returns actionable validation messages", () => {

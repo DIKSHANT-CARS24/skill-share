@@ -13,6 +13,8 @@ import type { UploadFormState } from "@/lib/upload-form-state";
 import type { UploadDraft } from "@/lib/types";
 import {
   getMarkdownUploadContentType,
+  normalizeMarkdownUploadBlob,
+  normalizeMarkdownUploadFile,
   isSupportedMarkdownUpload,
 } from "@/lib/upload-utils";
 
@@ -422,8 +424,8 @@ async function restoreStoredFiles(
 
   await Promise.allSettled(
     backups.map((backup) =>
-      supabase.storage.from("skills").upload(backup.path, backup.file, {
-        contentType: backup.contentType,
+      supabase.storage.from("skills").upload(backup.path, normalizeMarkdownUploadBlob(backup.file), {
+        contentType: getMarkdownUploadContentType(),
         upsert: true,
       }),
     ),
@@ -478,6 +480,7 @@ export async function uploadSkill(
   }
 
   const fileToUpload = markdownFile as File;
+  const normalizedMarkdownFile = normalizeMarkdownUploadFile(fileToUpload);
 
   const baseSlug = slugify(title);
   const slug = await createUniqueSkillSlug(baseSlug, async (candidate) => {
@@ -495,7 +498,7 @@ export async function uploadSkill(
   const storagePath = `${context.member.user_id}/${slug}/v1.md`;
   const { error: uploadError } = await context.supabase.storage.from("skills").upload(
     storagePath,
-    fileToUpload,
+    normalizedMarkdownFile,
     {
       contentType: getMarkdownUploadContentType(),
       upsert: false,
@@ -503,6 +506,12 @@ export async function uploadSkill(
   );
 
   if (uploadError) {
+    console.error("Markdown upload failed during skill creation", {
+      storagePath,
+      originalType: fileToUpload.type || "(empty)",
+      normalizedType: normalizedMarkdownFile.type,
+      message: uploadError.message,
+    });
     return createResponse(uploadError.message, [], fieldValues);
   }
 
@@ -725,13 +734,14 @@ export async function updateSkill(
 
   if (hasMarkdownFile) {
     const fileToUpload = markdownFile as File;
+    const normalizedMarkdownFile = normalizeMarkdownUploadFile(fileToUpload);
     uploadedStoragePath = versionChanged
       ? `${context.member.user_id}/${existingSkill.slug}/v${requestedVersion}.md`
       : existingSkill.file_path;
 
     const { error: uploadError } = await context.supabase.storage.from("skills").upload(
       uploadedStoragePath,
-      fileToUpload,
+      normalizedMarkdownFile,
       {
         contentType: getMarkdownUploadContentType(),
         upsert: !versionChanged,
@@ -739,6 +749,12 @@ export async function updateSkill(
     );
 
     if (uploadError) {
+      console.error("Markdown upload failed during skill edit", {
+        storagePath: uploadedStoragePath,
+        originalType: fileToUpload.type || "(empty)",
+        normalizedType: normalizedMarkdownFile.type,
+        message: uploadError.message,
+      });
       return createResponse(uploadError.message, [], fieldValues);
     }
   }
