@@ -54,6 +54,7 @@ export type MarkdownBlock =
   | { type: "code"; language: string; content: string };
 
 export interface SkillVersion {
+  id?: string;
   version: string;
   publishedAt: string;
   status: SkillStatus;

@@ -8,21 +8,21 @@ export function VersionHistory({ versions }: { versions: SkillVersion[] }) {
     <Panel padding="md">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-[var(--font-size-label-m)] leading-[var(--line-height-body)] font-semibold text-foreground">Version history</h2>
+          <h2 className="text-[var(--font-size-label-m)] leading-[var(--line-height-body)] font-semibold text-foreground">Recent changes</h2>
           <p className="mt-1 text-[var(--font-size-body-s)] leading-[var(--line-height-body)] text-muted">
-            Review recent updates and release notes for this skill.
+            Review what changed on each save, with the related version shown on every entry.
           </p>
         </div>
-        <Badge size="xs">Recent changes</Badge>
+        <Badge size="xs">Change log</Badge>
       </div>
 
       <div className="mt-5 space-y-4">
-        {versions.length ? versions.map((version) => {
+        {versions.length ? versions.map((version, index) => {
           const status = getStatusMeta(version.status);
 
           return (
             <article
-              key={version.version}
+              key={version.id ?? `${version.version}-${version.publishedAt}-${index}`}
               className={getPanelClassName({ tone: "subtle", padding: "md", className: "shadow-none" })}
             >
               <div className="flex flex-wrap items-center gap-2">
@@ -41,7 +41,7 @@ export function VersionHistory({ versions }: { versions: SkillVersion[] }) {
               className: "shadow-none text-[var(--font-size-body-s)] leading-[var(--line-height-body)] text-muted",
             })}
           >
-            No version history has been recorded for this skill yet.
+            No changes have been recorded for this skill yet.
           </div>
         )}
       </div>

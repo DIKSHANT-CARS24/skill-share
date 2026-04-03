@@ -11,6 +11,7 @@ import {
 } from "@/lib/category-taxonomy";
 import type { UploadFormState } from "@/lib/upload-form-state";
 import type { UploadDraft } from "@/lib/types";
+import { buildSkillChangeSummary } from "@/lib/skill-history";
 import {
   getMarkdownUploadContentType,
   normalizeMarkdownUploadBlob,
@@ -32,7 +33,6 @@ type EditableSkillRecord = {
 type EditableSkillVersionRecord = {
   id: string;
   storage_path: string;
-  change_notes: string | null;
 };
 
 type DeletableSkillRecord = {
@@ -258,82 +258,6 @@ function createSubmittedFieldValues({
     summary: description,
     version,
   } satisfies Partial<UploadDraft>;
-}
-
-function describeMetadataChanges({
-  previousTitle,
-  nextTitle,
-  previousCategoryId,
-  nextCategoryId,
-  previousDescription,
-  nextDescription,
-}: {
-  previousTitle: string;
-  nextTitle: string;
-  previousCategoryId: string;
-  nextCategoryId: string;
-  previousDescription: string;
-  nextDescription: string;
-}) {
-  const changedFields: string[] = [];
-
-  if (previousTitle !== nextTitle) {
-    changedFields.push("title");
-  }
-
-  if (previousCategoryId !== nextCategoryId) {
-    changedFields.push("category");
-  }
-
-  if (previousDescription !== nextDescription) {
-    changedFields.push("description");
-  }
-
-  return changedFields;
-}
-
-function formatChangeList(values: string[]) {
-  if (values.length <= 1) {
-    return values[0] ?? "";
-  }
-
-  if (values.length === 2) {
-    return `${values[0]} and ${values[1]}`;
-  }
-
-  return `${values.slice(0, -1).join(", ")}, and ${values.at(-1)}`;
-}
-
-function buildChangeNotes({
-  metadataChanges,
-  replacementFileName,
-  previousVersion,
-  nextVersion,
-}: {
-  metadataChanges: string[];
-  replacementFileName?: string;
-  previousVersion: number;
-  nextVersion: number;
-}) {
-  const notes: string[] = [];
-
-  if (previousVersion !== nextVersion) {
-    notes.push(`Set the live version to v${nextVersion}.`);
-  }
-
-  if (replacementFileName) {
-    notes.push(`Replaced the markdown file with ${replacementFileName}.`);
-  }
-
-  if (metadataChanges.length > 0) {
-    notes.push(`Updated ${formatChangeList(metadataChanges)}.`);
-  }
-
-  if (notes.length === 0) {
-    notes.push("Saved the latest version.");
-  }
-
-  return notes.join(" ");
 }
 
 function parseVersionNumber(value: string) {
@@ -567,6 +491,23 @@ export async function uploadSkill(
     return createResponse(skillVersionError.message, [], fieldValues);
   }
 
+  const { error: changeEventError } = await context.supabase.from("skill_change_events").insert({
+    skill_id: skillId,
+    version_number: 1,
+    change_summary: "Initial upload.",
+    created_by: context.member.user_id,
+  });
+
+  if (changeEventError) {
+    await rollbackCreatedSkill({
+      skillId,
+      storagePath,
+      userSupabase: context.supabase,
+    });
+
+    return createResponse(changeEventError.message, [], fieldValues);
+  }
+
   await revalidateSkillPaths(slug, skillId);
   redirect(`/skills/${slug}`);
 }
@@ -661,6 +602,7 @@ export async function updateSkill(
   const previousRawCategoryId =
     (existingMappings?.[0] as SkillCategoryLookupRow | undefined)?.category_id ?? "";
   let previousCanonicalCategoryId = "";
+  let previousCategoryName = "";
 
   if (previousRawCategoryId) {
     const { data: previousCategory, error: previousCategoryError } = await context.supabase
@@ -673,30 +615,43 @@ export async function updateSkill(
       return createResponse(previousCategoryError.message, [], fieldValues);
     }
 
-    previousCanonicalCategoryId =
-      getCanonicalCategoryFromRow(previousCategory ?? { id: previousRawCategoryId })?.id ?? "";
+    const canonicalPreviousCategory = getCanonicalCategoryFromRow(
+      previousCategory ?? { id: previousRawCategoryId },
+    );
+    previousCanonicalCategoryId = canonicalPreviousCategory?.id ?? "";
+    previousCategoryName =
+      canonicalPreviousCategory?.name ?? previousCategory?.name ?? previousRawCategoryId;
   }
 
   const nextCanonicalCategoryId = normalizeCategoryValue(categoryId) || categoryId;
   const previousDescription =
     existingSkill.long_description ?? existingSkill.short_description ?? "";
   const versionChanged = requestedVersion !== existingCurrentVersion;
-  const metadataChanges = describeMetadataChanges({
+  const nextCategoryName =
+    getCanonicalCategoryFromRow(categoryLookup.category)?.name ??
+    categoryLookup.category.name ??
+    nextCanonicalCategoryId;
+  const replacementFileName =
+    hasMarkdownFile && markdownFile instanceof File ? markdownFile.name : undefined;
+  const { changedFields, summary: changeSummary } = buildSkillChangeSummary({
     previousTitle: existingSkill.title,
     nextTitle: title,
-    previousCategoryId: previousCanonicalCategoryId,
-    nextCategoryId: nextCanonicalCategoryId,
+    previousCategoryName,
+    nextCategoryName,
     previousDescription,
     nextDescription: longDescription || summary,
+    replacementFileName,
+    previousVersion: existingCurrentVersion,
+    nextVersion: requestedVersion,
   });
 
-  if (!hasMarkdownFile && metadataChanges.length === 0 && !versionChanged) {
+  if (!hasMarkdownFile && changedFields.length === 0) {
     return createResponse("Make a change before saving so the edit is meaningful.", [], fieldValues);
   }
 
   const { data: currentVersionRecord, error: currentVersionRecordError } = await context.supabase
     .from("skill_versions")
-    .select("id, storage_path, change_notes")
+    .select("id, storage_path")
     .eq("skill_id", skillId)
     .eq("version_number", existingCurrentVersion)
     .maybeSingle<EditableSkillVersionRecord>();
@@ -760,17 +715,10 @@ export async function updateSkill(
   }
 
   const storagePathForVersion = uploadedStoragePath ?? existingSkill.file_path;
-  const replacementFileName =
-    hasMarkdownFile && markdownFile instanceof File ? markdownFile.name : undefined;
-  const changeNotes = buildChangeNotes({
-    metadataChanges,
-    replacementFileName,
-    previousVersion: existingCurrentVersion,
-    nextVersion: requestedVersion,
-  });
   const categoryChanged = previousCanonicalCategoryId !== nextCanonicalCategoryId;
   let insertedNewCategoryMapping = false;
   const insertedVersionId = versionChanged || !currentVersionRecord ? randomUUID() : null;
+  const changeEventId = randomUUID();
   const nextCategoryRowId = categoryLookup.category.id;
 
   if (categoryChanged) {
@@ -800,7 +748,7 @@ export async function updateSkill(
           skill_id: skillId,
           version_number: requestedVersion,
           storage_path: storagePathForVersion,
-          change_notes: changeNotes,
+          change_notes: changeSummary,
           created_by: context.member.user_id,
         })
       : null;
@@ -824,6 +772,37 @@ export async function updateSkill(
     };
   }
 
+  const { error: changeEventError } = await context.supabase.from("skill_change_events").insert({
+    id: changeEventId,
+    skill_id: skillId,
+    version_number: requestedVersion,
+    change_summary: changeSummary,
+    created_by: context.member.user_id,
+  });
+
+  if (changeEventError) {
+    if (insertedVersionId) {
+      await context.supabase.from("skill_versions").delete().eq("id", insertedVersionId);
+    }
+
+    if (insertedNewCategoryMapping) {
+      await context.supabase
+        .from("skill_categories")
+        .delete()
+        .eq("skill_id", skillId)
+        .eq("category_id", nextCategoryRowId);
+    }
+
+    await removeStoredFiles(
+      context.supabase,
+      getRollbackStoragePaths({ uploadedStoragePath, versionChanged }),
+    );
+    return {
+      ...createDatabaseFailureResponse(changeEventError.message, requestedVersionValue),
+      fieldValues,
+    };
+  }
+
   const { data: updatedSkill, error: skillUpdateError } = await context.supabase
     .from("skills")
     .update({
@@ -838,6 +817,8 @@ export async function updateSkill(
     .maybeSingle();
 
   if (skillUpdateError || !updatedSkill) {
+    await context.supabase.from("skill_change_events").delete().eq("id", changeEventId);
+
     if (insertedVersionId) {
       await context.supabase.from("skill_versions").delete().eq("id", insertedVersionId);
     }
@@ -888,6 +869,8 @@ export async function updateSkill(
           current_version: existingCurrentVersion,
         })
         .eq("id", skillId);
+
+      await context.supabase.from("skill_change_events").delete().eq("id", changeEventId);
 
       if (insertedVersionId) {
         await context.supabase.from("skill_versions").delete().eq("id", insertedVersionId);

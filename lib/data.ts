@@ -49,6 +49,15 @@ type SkillVersionRow = {
   created_by: string;
 };
 
+type SkillChangeEventRow = {
+  id: string;
+  skill_id: string;
+  version_number: number | string;
+  change_summary: string;
+  created_at: string;
+  created_by: string;
+};
+
 type CategoryRow = {
   id: string;
   slug?: string;
@@ -268,7 +277,31 @@ export async function getSkillDetailBySlug(supabase: SupabaseClient, slug: strin
   const latestStoragePath = latestVersion?.storage_path ?? skill.file_path;
   const { data: file } = await supabase.storage.from("skills").download(latestStoragePath);
   const markdown = file ? await file.text() : "No markdown file could be loaded.";
-  const versionHistory: SkillVersion[] = versionsForSkill.map((item) => ({
+  const { data: changeEvents, error: changeEventsError } = await supabase
+    .from("skill_change_events")
+    .select("id, skill_id, version_number, change_summary, created_at, created_by")
+    .eq("skill_id", skill.id)
+    .order("created_at", { ascending: false });
+
+  if (changeEventsError) {
+    console.warn("Failed to load skill change events, falling back to version rows.", {
+      skillId: skill.id,
+      message: changeEventsError.message,
+    });
+  }
+
+  const changeEventHistory: SkillVersion[] = ((changeEvents ?? []) as SkillChangeEventRow[]).map(
+    (item) => ({
+      id: item.id,
+      version: String(item.version_number),
+      publishedAt: item.created_at,
+      status: isSkillStatus(skill.status) ? skill.status : "published",
+      summary: item.change_summary,
+    }),
+  );
+
+  const fallbackVersionHistory: SkillVersion[] = versionsForSkill.map((item) => ({
+    id: item.id,
     version: String(item.version_number),
     publishedAt: item.created_at,
     status: isSkillStatus(skill.status) ? skill.status : "published",
@@ -311,12 +344,12 @@ export async function getSkillDetailBySlug(supabase: SupabaseClient, slug: strin
       uploaderEmail: uploader.email,
       status: isSkillStatus(skill.status) ? skill.status : "published",
       latestVersion: String(skill.current_version),
-      versionCount: versionHistory.length || 1,
+      versionCount: versionsForSkill.length || 1,
       updatedAt: skill.updated_at,
       createdAt: skill.created_at,
       downloads: getDownloadCountForSkill(downloadCountBySkillId, skill.id),
       markdownBlocks: markdownToBlocks(markdown),
-      versionHistory,
+      versionHistory: changeEventHistory.length ? changeEventHistory : fallbackVersionHistory,
       filePath: latestStoragePath,
     } satisfies Skill,
     category,
