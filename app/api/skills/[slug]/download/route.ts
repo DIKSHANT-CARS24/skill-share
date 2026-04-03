@@ -1,6 +1,7 @@
 import { type NextRequest } from "next/server";
 import { notFound } from "next/navigation";
 import { requireActiveMember } from "@/lib/auth";
+import { shouldLogSkillDownload } from "@/lib/downloads";
 
 function createDownloadFileName(title: string, fallbackSlug: string) {
   const normalizedTitle = title
@@ -13,7 +14,7 @@ function createDownloadFileName(title: string, fallbackSlug: string) {
 }
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const context = await requireActiveMember();
@@ -58,13 +59,15 @@ export async function GET(
     throw new Error(downloadError?.message ?? "The markdown file could not be downloaded.");
   }
 
-  const { error: insertDownloadError } = await context.supabase.from("downloads").insert({
-    skill_id: skill.id,
-    user_id: context.member.user_id,
-  });
+  if (shouldLogSkillDownload(request.headers)) {
+    const { error: insertDownloadError } = await context.supabase.from("downloads").insert({
+      skill_id: skill.id,
+      user_id: context.member.user_id,
+    });
 
-  if (insertDownloadError) {
-    console.error("Failed to log skill download", insertDownloadError);
+    if (insertDownloadError) {
+      console.error("Failed to log skill download", insertDownloadError);
+    }
   }
 
   return new Response(file, {

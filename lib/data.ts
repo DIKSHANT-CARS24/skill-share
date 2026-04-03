@@ -5,6 +5,11 @@ import {
   getCanonicalCategories,
   getCanonicalCategoryFromRow,
 } from "@/lib/category-taxonomy";
+import {
+  buildDownloadCountBySkillId,
+  getDownloadCountForSkill,
+  type DownloadCountRow,
+} from "@/lib/downloads";
 import { getSkillsForCatalog } from "@/lib/skills";
 import type {
   Category,
@@ -42,10 +47,6 @@ type SkillVersionRow = {
   change_notes: string | null;
   created_at: string;
   created_by: string;
-};
-
-type DownloadRow = {
-  skill_id: string;
 };
 
 type CategoryRow = {
@@ -165,7 +166,7 @@ export async function listCatalogData(supabase: SupabaseClient) {
     skills: (skills.data ?? []) as SkillRow[],
     skillCategories: (skillCategories.data ?? []) as SkillCategoryRow[],
     versions: (versions.data ?? []) as SkillVersionRow[],
-    downloads: (downloads.data ?? []) as DownloadRow[],
+    downloads: (downloads.data ?? []) as DownloadCountRow[],
   };
 }
 
@@ -177,19 +178,12 @@ export async function listSkillsForCatalog(
   const rawCategoryById = new Map(catalog.categories.map((category) => [category.id, category]));
   const memberById = new Map(catalog.members.map((member) => [member.user_id, member]));
   const versionCountBySkillId = new Map<string, number>();
-  const downloadCountBySkillId = new Map<string, number>();
+  const downloadCountBySkillId = buildDownloadCountBySkillId(catalog.downloads);
 
   catalog.versions.forEach((version) => {
     versionCountBySkillId.set(
       version.skill_id,
       (versionCountBySkillId.get(version.skill_id) ?? 0) + 1,
-    );
-  });
-
-  catalog.downloads.forEach((download) => {
-    downloadCountBySkillId.set(
-      download.skill_id,
-      (downloadCountBySkillId.get(download.skill_id) ?? 0) + 1,
     );
   });
 
@@ -222,7 +216,7 @@ export async function listSkillsForCatalog(
       versionCount: versionCountBySkillId.get(skill.id) ?? 1,
       updatedAt: skill.updated_at,
       createdAt: skill.created_at,
-      downloads: downloadCountBySkillId.get(skill.id) ?? 0,
+      downloads: getDownloadCountForSkill(downloadCountBySkillId, skill.id),
       markdownBlocks: [],
       versionHistory: [],
       filePath: skill.file_path,
@@ -248,6 +242,7 @@ export async function listSkillsForCatalog(
 
 export async function getSkillDetailBySlug(supabase: SupabaseClient, slug: string) {
   const catalog = await listCatalogData(supabase);
+  const downloadCountBySkillId = buildDownloadCountBySkillId(catalog.downloads);
   const skill = catalog.skills.find(
     (item) => item.slug === slug || (isUuidLike(slug) && item.id === slug),
   );
@@ -319,8 +314,7 @@ export async function getSkillDetailBySlug(supabase: SupabaseClient, slug: strin
       versionCount: versionHistory.length || 1,
       updatedAt: skill.updated_at,
       createdAt: skill.created_at,
-      downloads:
-        catalog.downloads.filter((download) => download.skill_id === skill.id).length,
+      downloads: getDownloadCountForSkill(downloadCountBySkillId, skill.id),
       markdownBlocks: markdownToBlocks(markdown),
       versionHistory,
       filePath: latestStoragePath,

@@ -61,9 +61,7 @@ export default async function SkillDetailPage({
 
           <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
             <Button asChild className="w-full sm:w-auto">
-              <Link href={`/api/skills/${skill.slug ?? skill.id}/download`}>
-                Download .md
-              </Link>
+              <a href={`/api/skills/${skill.slug ?? skill.id}/download`}>Download .md</a>
             </Button>
             {canEditSkill ? (
               <Button asChild variant="accentSecondary" className="w-full sm:w-auto">
