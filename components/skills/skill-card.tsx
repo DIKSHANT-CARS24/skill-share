@@ -36,8 +36,9 @@ export function SkillCard({ skill }: { skill: Skill }) {
   return (
     <Link href={`/skills/${skill.slug ?? skill.id}`} className="block h-full">
       <Panel
+        tone="static-subtle"
         padding="md"
-        className="h-[20.5rem] overflow-hidden transition-[border-color,transform,box-shadow] hover:-translate-y-0.5 hover:border-border-strong"
+        className="h-[20.5rem] overflow-hidden transition-colors duration-200 hover:border-border-strong"
       >
         <div className="flex h-full min-h-0 flex-col gap-3.5">
           <div className="flex min-h-0 flex-1 flex-col gap-3.5">
@@ -50,9 +51,9 @@ export function SkillCard({ skill }: { skill: Skill }) {
             <div className="flex min-h-0 flex-1 flex-col gap-2.5">
               <h2
                 className="text-[1.22rem] leading-[1.16] font-semibold text-foreground"
-              style={titleClampStyle}
-            >
-              {skill.title}
+                style={titleClampStyle}
+              >
+                {skill.title}
               </h2>
               <p
                 className="min-h-0 text-[var(--font-size-body-m)] leading-[1.48] text-muted"

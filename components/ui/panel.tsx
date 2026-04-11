@@ -1,12 +1,13 @@
 import { cx } from "@/lib/utils";
 
-export type PanelTone = "default" | "subtle" | "brand-subtle";
+export type PanelTone = "default" | "subtle" | "brand-subtle" | "static-subtle";
 export type PanelPadding = "none" | "md" | "lg";
 
 const toneClasses: Record<PanelTone, string> = {
   default: "glass-surface-strong rounded-[24px]",
   subtle: "glass-surface rounded-[24px]",
   "brand-subtle": "glass-surface-brand rounded-[24px]",
+  "static-subtle": "glass-surface-static rounded-[24px]",
 };
 
 const paddingClasses: Record<PanelPadding, string> = {

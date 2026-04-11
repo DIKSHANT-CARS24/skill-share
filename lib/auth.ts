@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { redirect, unauthorized } from "next/navigation";
 import type { JwtPayload, SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
@@ -78,7 +79,7 @@ export async function ensureOrgMemberRow(supabase: SupabaseClient, userId: strin
   return data ?? null;
 }
 
-export async function getOptionalMemberContext() {
+export const getOptionalMemberContext = cache(async function getOptionalMemberContext() {
   const supabase = await createClient();
   const claims = await getClaims(supabase);
 
@@ -139,9 +140,9 @@ export async function getOptionalMemberContext() {
     member,
     access: "granted" as const,
   };
-}
+});
 
-export async function requireActiveMember() {
+export const requireActiveMember = cache(async function requireActiveMember() {
   const context = await getOptionalMemberContext();
 
   if (!context) {
@@ -153,9 +154,9 @@ export async function requireActiveMember() {
   }
 
   return context satisfies AuthenticatedMemberContext;
-}
+});
 
-export async function requireAdmin() {
+export const requireAdmin = cache(async function requireAdmin() {
   const context = await requireActiveMember();
 
   if (context.member.role !== "admin") {
@@ -163,4 +164,4 @@ export async function requireAdmin() {
   }
 
   return context;
-}
+});

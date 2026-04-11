@@ -49,6 +49,10 @@ type SkillVersionRow = {
   created_by: string;
 };
 
+type SkillVersionCountRow = {
+  skill_id: string;
+};
+
 type SkillChangeEventRow = {
   id: string;
   skill_id: string;
@@ -85,16 +89,8 @@ function getFileNameFromStoragePath(storagePath: string) {
   return storagePath.split("/").filter(Boolean).at(-1) ?? "stored-skill.md";
 }
 
-export async function listCategories(supabase: SupabaseClient) {
-  const { error } = await supabase
-    .from("categories")
-    .select("id, slug, name")
-    .order("name", { ascending: true });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
+export async function listCategories(_supabase: SupabaseClient) {
+  void _supabase;
   return getCanonicalCategories();
 }
 
@@ -179,13 +175,57 @@ export async function listCatalogData(supabase: SupabaseClient) {
   };
 }
 
+async function listCatalogIndexData(supabase: SupabaseClient) {
+  const [categories, members, skills, skillCategories, versions, downloads] = await Promise.all([
+    listCategoryRows(supabase),
+    listOrgMembers(supabase),
+    supabase
+      .from("skills")
+      .select(
+        "id, title, slug, short_description, long_description, uploader_id, file_path, current_version, status, created_at, updated_at",
+      )
+      .order("updated_at", { ascending: false }),
+    supabase.from("skill_categories").select("skill_id, category_id"),
+    supabase.from("skill_versions").select("skill_id"),
+    supabase.from("downloads").select("skill_id"),
+  ]);
+
+  if (skills.error) {
+    throw new Error(skills.error.message);
+  }
+
+  if (skillCategories.error) {
+    throw new Error(skillCategories.error.message);
+  }
+
+  if (versions.error) {
+    throw new Error(versions.error.message);
+  }
+
+  if (downloads.error) {
+    throw new Error(downloads.error.message);
+  }
+
+  return {
+    categories,
+    members,
+    skills: (skills.data ?? []) as SkillRow[],
+    skillCategories: (skillCategories.data ?? []) as SkillCategoryRow[],
+    versions: (versions.data ?? []) as SkillVersionCountRow[],
+    downloads: (downloads.data ?? []) as DownloadCountRow[],
+  };
+}
+
 export async function listSkillsForCatalog(
   supabase: SupabaseClient,
   query: SkillCatalogQuery,
-): Promise<{ categories: Category[]; uploaders: Uploader[]; skills: Skill[] }> {
-  const catalog = await listCatalogData(supabase);
+): Promise<{ categories: Category[]; uploaders: Uploader[]; skills: Skill[]; totalSkillCount: number }> {
+  const catalog = await listCatalogIndexData(supabase);
   const rawCategoryById = new Map(catalog.categories.map((category) => [category.id, category]));
   const memberById = new Map(catalog.members.map((member) => [member.user_id, member]));
+  const categoryIdBySkillId = new Map(
+    catalog.skillCategories.map((item) => [item.skill_id, item.category_id] as const),
+  );
   const versionCountBySkillId = new Map<string, number>();
   const downloadCountBySkillId = buildDownloadCountBySkillId(catalog.downloads);
 
@@ -199,8 +239,7 @@ export async function listSkillsForCatalog(
   const skills: Skill[] = [];
 
   catalog.skills.forEach((skill) => {
-    const rawCategoryId =
-      catalog.skillCategories.find((item) => item.skill_id === skill.id)?.category_id ?? "";
+    const rawCategoryId = categoryIdBySkillId.get(skill.id) ?? "";
     const rawCategory = rawCategoryById.get(rawCategoryId);
     const category = rawCategory ? getCanonicalCategoryFromRow(rawCategory) : null;
     const member = memberById.get(skill.uploader_id);
@@ -246,42 +285,106 @@ export async function listSkillsForCatalog(
     categories: getCanonicalCategories(),
     uploaders,
     skills: getSkillsForCatalog(skills, query),
+    totalSkillCount: skills.length,
   };
 }
 
 export async function getSkillDetailBySlug(supabase: SupabaseClient, slug: string) {
-  const catalog = await listCatalogData(supabase);
-  const downloadCountBySkillId = buildDownloadCountBySkillId(catalog.downloads);
-  const skill = catalog.skills.find(
-    (item) => item.slug === slug || (isUuidLike(slug) && item.id === slug),
-  );
+  const skillQuery = supabase
+    .from("skills")
+    .select(
+      "id, title, slug, short_description, long_description, uploader_id, file_path, current_version, status, created_at, updated_at",
+    );
+  const skillResult = isUuidLike(slug)
+    ? await skillQuery.eq("id", slug).maybeSingle<SkillRow>()
+    : await skillQuery.eq("slug", slug).maybeSingle<SkillRow>();
+
+  if (skillResult.error) {
+    throw new Error(skillResult.error.message);
+  }
+
+  const skill = skillResult.data;
 
   if (!skill) {
     return null;
   }
 
-  const rawCategoryId =
-    catalog.skillCategories.find((item) => item.skill_id === skill.id)?.category_id ?? "";
-  const rawCategory = catalog.categories.find((item) => item.id === rawCategoryId) ?? null;
-  const category = rawCategory ? getCanonicalCategoryFromRow(rawCategory) : null;
-  const uploader = catalog.members.find((item) => item.user_id === skill.uploader_id) ?? null;
+  const [skillCategoryResult, uploaderResult, versionsResult, downloadsResult, changeEventsResult] =
+    await Promise.all([
+      supabase
+        .from("skill_categories")
+        .select("skill_id, category_id")
+        .eq("skill_id", skill.id)
+        .maybeSingle<SkillCategoryRow>(),
+      supabase
+        .from("org_members")
+        .select("user_id, email, role, is_active, created_at")
+        .eq("user_id", skill.uploader_id)
+        .maybeSingle<OrgMemberRecord>(),
+      supabase
+        .from("skill_versions")
+        .select("id, skill_id, version_number, storage_path, change_notes, created_at, created_by")
+        .eq("skill_id", skill.id)
+        .order("version_number", { ascending: false }),
+      supabase.from("downloads").select("skill_id").eq("skill_id", skill.id),
+      supabase
+        .from("skill_change_events")
+        .select("id, skill_id, version_number, change_summary, created_at, created_by")
+        .eq("skill_id", skill.id)
+        .order("created_at", { ascending: false }),
+    ]);
+
+  if (skillCategoryResult.error) {
+    throw new Error(skillCategoryResult.error.message);
+  }
+
+  if (uploaderResult.error) {
+    throw new Error(uploaderResult.error.message);
+  }
+
+  if (versionsResult.error) {
+    throw new Error(versionsResult.error.message);
+  }
+
+  if (downloadsResult.error) {
+    throw new Error(downloadsResult.error.message);
+  }
+
+  const rawCategoryId = skillCategoryResult.data?.category_id ?? "";
+  let category: Category | null = null;
+
+  if (rawCategoryId) {
+    const categoryResult = await supabase
+      .from("categories")
+      .select("id, slug, name")
+      .eq("id", rawCategoryId)
+      .maybeSingle<CategoryRow>();
+
+    if (categoryResult.error) {
+      throw new Error(categoryResult.error.message);
+    }
+
+    category = categoryResult.data ? getCanonicalCategoryFromRow(categoryResult.data) : null;
+  }
+
+  const uploader = uploaderResult.data ?? null;
 
   if (!category || !uploader) {
     return null;
   }
 
-  const versionsForSkill = catalog.versions
-    .filter((item) => item.skill_id === skill.id)
-    .sort((left, right) => Number(right.version_number) - Number(left.version_number));
+  const versionsForSkill = ((versionsResult.data ?? []) as SkillVersionRow[]).sort(
+    (left, right) => Number(right.version_number) - Number(left.version_number),
+  );
   const latestVersion = versionsForSkill[0];
   const latestStoragePath = latestVersion?.storage_path ?? skill.file_path;
   const { data: file } = await supabase.storage.from("skills").download(latestStoragePath);
   const markdown = file ? await file.text() : "No markdown file could be loaded.";
-  const { data: changeEvents, error: changeEventsError } = await supabase
-    .from("skill_change_events")
-    .select("id, skill_id, version_number, change_summary, created_at, created_by")
-    .eq("skill_id", skill.id)
-    .order("created_at", { ascending: false });
+  const downloadCountBySkillId = buildDownloadCountBySkillId(
+    (downloadsResult.data ?? []) as DownloadCountRow[],
+  );
+  const changeEvents = changeEventsResult.data;
+  const changeEventsError = changeEventsResult.error;
 
   if (changeEventsError) {
     console.warn("Failed to load skill change events, falling back to version rows.", {
@@ -308,28 +411,6 @@ export async function getSkillDetailBySlug(supabase: SupabaseClient, slug: strin
     summary: item.change_notes ?? "No change notes recorded.",
   }));
 
-  const relatedSkills = catalog.skills
-    .filter((item) => item.id !== skill.id)
-    .filter((item) => {
-      const relatedRawCategoryId =
-        catalog.skillCategories.find((mapping) => mapping.skill_id === item.id)?.category_id ?? "";
-      const relatedRawCategory =
-        catalog.categories.find((catalogCategory) => catalogCategory.id === relatedRawCategoryId) ??
-        null;
-      const relatedCategory = relatedRawCategory
-        ? getCanonicalCategoryFromRow(relatedRawCategory)
-        : null;
-
-      return relatedCategory?.id === category.id;
-    })
-    .slice(0, 3)
-    .map((item) => ({
-      id: item.id,
-      slug: item.slug,
-      title: item.title,
-      summary: item.short_description ?? "No short description yet.",
-    }));
-
   return {
     skill: {
       id: skill.id,
@@ -354,7 +435,7 @@ export async function getSkillDetailBySlug(supabase: SupabaseClient, slug: strin
     } satisfies Skill,
     category,
     uploader: mapMemberToUploader(uploader),
-    relatedSkills,
+    relatedSkills: [],
     currentFileName: getFileNameFromStoragePath(latestStoragePath),
   };
 }
