@@ -36,7 +36,7 @@ export function TextAreaField({
     <label className={cx("flex min-w-0 flex-col gap-2", className)}>
       <span
         className={cx(
-          "text-[var(--font-size-label-m)] leading-[var(--line-height-body)] font-semibold text-foreground",
+          "text-[var(--font-size-label-m)] leading-[var(--line-height-body)] font-medium text-foreground",
           disabled && "text-border-strong",
         )}
       >
@@ -44,12 +44,12 @@ export function TextAreaField({
       </span>
       <div
         className={cx(
-          "overflow-hidden rounded-[14px] border bg-surface-strong p-3 transition-[background-color,border-color,box-shadow]",
+          "glass-input overflow-hidden rounded-[18px] p-3 transition-[background-color,border-color,box-shadow]",
           disabled
-            ? "border-border bg-surface"
+            ? "border-white/26 bg-white/36"
             : hasError
-              ? "border-danger"
-              : "border-border focus-within:border-accent focus-within:bg-surface-brand-subtle",
+              ? "border-danger/45"
+              : "",
           fieldClassName,
         )}
       >

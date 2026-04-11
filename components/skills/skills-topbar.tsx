@@ -76,7 +76,7 @@ export function SkillsTopbar({ member }: SkillsTopbarProps) {
             labelClassName="sr-only"
             size="medium"
             className="min-w-0 w-full xl:max-w-[540px] xl:flex-[0_1_540px]"
-            fieldClassName="min-h-12 rounded-[12px] bg-background px-[14px] py-0"
+            fieldClassName="min-h-12 rounded-[18px] px-[14px] py-0"
           >
             <svg
               aria-hidden="true"

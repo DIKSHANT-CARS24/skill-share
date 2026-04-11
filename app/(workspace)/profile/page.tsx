@@ -25,7 +25,9 @@ export default async function ProfilePage() {
       <ProfileOverview uploader={uploader} skills={authoredSkills} />
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_320px]">
-        <Panel padding="md">
+        <Panel padding="md" className="relative overflow-hidden">
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(71,54,254,0.08),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(255,189,220,0.08),transparent_30%)]" />
+          <div className="relative">
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-[var(--font-size-label-m)] leading-[var(--line-height-body)] font-semibold text-foreground">
               Published skills
@@ -43,7 +45,7 @@ export default async function ProfilePage() {
                     href={`/skills/${skill.slug ?? skill.id}`}
                     className="block rounded-[20px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-strong)] focus-visible:ring-offset-2"
                   >
-                    <article className="rounded-[20px] border border-border bg-surface px-4 py-3.5 transition-[border-color,transform] hover:-translate-y-0.5 hover:border-border-strong">
+                    <article className="glass-surface-subtle rounded-[24px] px-4 py-4 transition-[border-color,transform,box-shadow] hover:-translate-y-0.5 hover:border-border-strong">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="text-[var(--font-size-label-m)] leading-[var(--line-height-body)] font-semibold text-foreground">
                           {skill.title}
@@ -72,10 +74,13 @@ export default async function ProfilePage() {
               />
             </div>
           )}
+          </div>
         </Panel>
 
         <div className="space-y-5">
-          <Panel padding="md">
+          <Panel padding="md" className="relative overflow-hidden">
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(71,54,254,0.06),transparent_28%)]" />
+            <div className="relative">
             <h2 className="text-[var(--font-size-label-m)] leading-[var(--line-height-body)] font-semibold text-foreground">
               Contribution areas
             </h2>
@@ -92,6 +97,7 @@ export default async function ProfilePage() {
                 Contribution areas will appear here after the first successful upload.
               </p>
             )}
+            </div>
           </Panel>
         </div>
       </div>

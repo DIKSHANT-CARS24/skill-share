@@ -17,6 +17,17 @@ export function formatDate(value: string) {
   }).format(new Date(value));
 }
 
+export function hasSkillBeenEdited(createdAt: string, updatedAt: string) {
+  const createdTime = new Date(createdAt).getTime();
+  const updatedTime = new Date(updatedAt).getTime();
+
+  if (!Number.isFinite(createdTime) || !Number.isFinite(updatedTime)) {
+    return false;
+  }
+
+  return updatedTime > createdTime;
+}
+
 export function getStatusMeta(status: string) {
   switch (status) {
     case "published":

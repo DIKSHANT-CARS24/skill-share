@@ -1,23 +1,43 @@
-# Skills page implementation notes
+# Skills Catalog Layout Spacing Refinement
 
 ## Exact files changed
 
-- `components/skills/filter-toolbar.tsx`
+- `app/(workspace)/skills/page.tsx`
+- `components/skills/skill-card.tsx`
 - `docs/ui-redesign/skills/implementation-notes.md`
 
-## How the Clear filters button was removed
+## How the grid was changed from 5-up to 4-up
 
-- Removed the `Clear filters` action from the filtered-state toolbar in `components/skills/filter-toolbar.tsx`.
-- No replacement secondary button was added, so the filtered state now relies on the existing applied-filter chips for removal.
+- Updated the `/skills` grid in `app/(workspace)/skills/page.tsx`.
+- The catalog grid now steps through:
+  - `md:grid-cols-2`
+  - `lg:grid-cols-3`
+  - `xl:grid-cols-4`
+- The previous `2xl:grid-cols-5` layout was removed so wide screens now render four cards per row instead of five.
 
-## How the filter chip click behavior was changed
+## How card height was preserved
 
-- Changed each applied filter chip from a single clickable button into a static chip container with a dedicated close-icon button inside it.
-- The chip text/body is now non-interactive and only the cross icon can trigger filter removal.
-- The chip styling remains aligned with the current Figma-library-based surface and border treatment.
+- Updated the shared catalog card container in `components/skills/skill-card.tsx`.
+- The previous square sizing behavior was replaced with a fixed card height: `h-[20.5rem]`.
+- This keeps the cards from becoming taller as they get wider in the new 4-up layout.
 
-## Whether URL params and results still update correctly after chip removal
+## How container/content spacing was increased
 
-- Yes.
-- The close icon still calls the existing query update flow in `filter-toolbar.tsx`.
-- Removing a filter updates the URL params, refreshes the catalog results, and keeps the current URL-driven `/skills` state behavior in sync.
+- Increased the main `/skills` container panel from the smaller shared padding treatment to a roomier page-specific inset:
+  - `padding="lg"`
+  - `sm:p-7`
+  - `xl:p-8`
+- Increased vertical spacing between the hero section, filters, and grid.
+- Increased the grid gap from `gap-4` to `gap-5`.
+- Applied the same roomier inset treatment to the filtered-empty-state version of the page so the layout stays consistent.
+
+## What should be reviewed locally after the change
+
+- `/skills` on wide desktop:
+  confirm the grid now shows four cards per row.
+- `/skills` panel insets:
+  confirm the counters, filters, and grid sit farther from the container edges.
+- Card proportions:
+  confirm the cards feel wider without becoming taller.
+- Responsive behavior:
+  confirm the grid still steps cleanly through tablet and laptop widths.

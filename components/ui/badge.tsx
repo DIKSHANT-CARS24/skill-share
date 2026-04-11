@@ -2,21 +2,21 @@ import type { BadgeAppearance, BadgeSize, BadgeTone } from "@/lib/types";
 import { cx } from "@/lib/utils";
 
 const appearanceClasses = {
-  subtle: "border-transparent",
-  solid: "border-transparent",
-  stroke: "border",
+  subtle: "border border-transparent shadow-[inset_0_1px_0_rgba(255,255,255,0.55)] backdrop-blur-[14px]",
+  solid: "border border-transparent shadow-[0_12px_24px_rgba(104,94,156,0.12)]",
+  stroke: "border backdrop-blur-[14px]",
 };
 
 const sizeClasses: Record<BadgeSize, string> = {
-  xs: "rounded-[12px] px-2 py-1.5 text-[11px]",
-  md: "rounded-[14px] px-3 py-2 text-[13px]",
+  xs: "rounded-full px-2.5 py-1.5 text-[11px]",
+  md: "rounded-full px-3.5 py-2 text-[13px]",
 };
 
 const toneAppearanceClasses = {
   neutral: {
     subtle: "bg-badge-neutral-subtle-surface text-badge-neutral-subtle-text",
     solid: "bg-badge-neutral-solid-surface text-white",
-    stroke: "border-border bg-badge-neutral-stroke-surface text-foreground",
+    stroke: "border-white/42 bg-badge-neutral-stroke-surface text-foreground",
   },
   information: {
     subtle: "bg-surface-brand-subtle text-badge-information-text",
@@ -26,17 +26,17 @@ const toneAppearanceClasses = {
   success: {
     subtle: "bg-success-soft text-badge-success-text",
     solid: "bg-badge-success-solid-surface text-white",
-    stroke: "border-badge-success-text bg-success-soft text-badge-success-text",
+    stroke: "border-badge-success-text/35 bg-success-soft text-badge-success-text",
   },
   warning: {
     subtle: "bg-warning-soft text-badge-warning-text",
     solid: "bg-badge-warning-solid-surface text-white",
-    stroke: "border-badge-warning-text bg-warning-soft text-badge-warning-text",
+    stroke: "border-badge-warning-text/30 bg-warning-soft text-badge-warning-text",
   },
   error: {
     subtle: "bg-danger-soft text-badge-error-text",
     solid: "bg-badge-error-solid-surface text-white",
-    stroke: "border-badge-error-text bg-danger-soft text-badge-error-text",
+    stroke: "border-badge-error-text/25 bg-danger-soft text-badge-error-text",
   },
 } satisfies Record<"neutral" | "information" | "success" | "warning" | "error", Record<BadgeAppearance, string>>;
 

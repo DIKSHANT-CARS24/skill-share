@@ -1,10 +1,16 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { ensureOrgMemberRow } from "@/lib/auth";
-import { getSafeNextPath, isCarsEmail } from "@/lib/auth-utils";
+import { getSafeNextPath, isCarsEmail, OAUTH_NEXT_COOKIE_NAME } from "@/lib/auth-utils";
 
 function buildRedirect(request: NextRequest, path: string) {
-  return NextResponse.redirect(new URL(path, request.url));
+  const response = NextResponse.redirect(new URL(path, request.url));
+  response.cookies.set(OAUTH_NEXT_COOKIE_NAME, "", {
+    path: "/",
+    maxAge: 0,
+  });
+  return response;
 }
 
 async function rejectAccess(request: NextRequest, reason: string) {
@@ -15,8 +21,12 @@ async function rejectAccess(request: NextRequest, reason: string) {
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
+  const cookieStore = await cookies();
   const code = requestUrl.searchParams.get("code");
-  const next = getSafeNextPath(requestUrl.searchParams.get("next"));
+  const cookieNext = cookieStore.get(OAUTH_NEXT_COOKIE_NAME)?.value;
+  const next = getSafeNextPath(
+    requestUrl.searchParams.get("next") ?? decodeCookieValue(cookieNext),
+  );
 
   if (!code) {
     return buildRedirect(
@@ -57,4 +67,16 @@ export async function GET(request: NextRequest) {
   }
 
   return buildRedirect(request, next);
+}
+
+function decodeCookieValue(value: string | undefined) {
+  if (!value) {
+    return undefined;
+  }
+
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
 }

@@ -65,7 +65,7 @@ export function InputShell({
     <label className={cx("flex min-w-0 flex-col gap-2", className)}>
       <span
         className={cx(
-          "text-[var(--font-size-label-m)] leading-[var(--line-height-body)] font-normal text-foreground",
+          "text-[var(--font-size-label-m)] leading-[var(--line-height-body)] font-medium text-foreground",
           disabled && "text-border-strong",
           labelClassName,
         )}
@@ -74,15 +74,15 @@ export function InputShell({
       </span>
       <div
         className={cx(
-          "flex items-center gap-2 overflow-hidden border transition-[background-color,border-color,box-shadow]",
+          "glass-input flex items-center gap-2 overflow-hidden transition-[background-color,border-color,box-shadow]",
           sizeClasses[size].field,
           disabled
-            ? "border-border bg-surface text-border-strong"
+            ? "border-white/26 bg-white/36 text-border-strong"
             : hasError
-              ? "border-danger bg-surface-strong"
+              ? "border-danger/45"
               : resolvedVariant === "primary"
-                ? "border-accent bg-surface-brand-subtle"
-                : "border-border bg-surface-strong focus-within:border-accent focus-within:bg-surface-brand-subtle",
+                ? "border-accent/30 shadow-[0_18px_36px_rgba(71,54,254,0.12)]"
+                : "",
           fieldClassName,
         )}
       >

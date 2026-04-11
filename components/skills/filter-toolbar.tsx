@@ -129,7 +129,7 @@ export function FilterToolbar({
               {activeBadges.map((badge) => (
                 <div
                   key={badge.key}
-                  className="inline-flex items-center gap-2 rounded-[12px] border border-border bg-surface-strong px-3 py-1.5 text-[11px] leading-[1.3] font-semibold text-foreground"
+                  className="glass-pill inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[11px] leading-[1.3] font-semibold text-foreground"
                 >
                   <span>{badge.label}</span>
                   <button
@@ -168,7 +168,7 @@ export function FilterToolbar({
                 onChange={(event) => setDraftSearch(event.currentTarget.value)}
                 size="medium"
                 className="min-w-0 sm:w-[220px]"
-                fieldClassName="min-h-10 rounded-[12px] bg-background px-3 py-0"
+                fieldClassName="min-h-10 rounded-[16px] px-3 py-0"
               />
             ) : null}
 
@@ -178,7 +178,7 @@ export function FilterToolbar({
                 labelClassName="sr-only"
                 size="medium"
                 className="min-w-0 sm:w-[170px]"
-                fieldClassName="min-h-10 rounded-[12px] bg-background px-3 py-0"
+                fieldClassName="min-h-10 rounded-[16px] px-3 py-0"
               >
                 <select
                   name="category"
@@ -203,7 +203,7 @@ export function FilterToolbar({
                 labelClassName="sr-only"
                 size="medium"
                 className="min-w-0 sm:w-[170px]"
-                fieldClassName="min-h-10 rounded-[12px] bg-background px-3 py-0"
+                fieldClassName="min-h-10 rounded-[16px] px-3 py-0"
               >
                 <select
                   name="uploader"
@@ -228,7 +228,7 @@ export function FilterToolbar({
                 labelClassName="sr-only"
                 size="medium"
                 className="min-w-0 sm:w-[150px]"
-                fieldClassName="min-h-10 rounded-[12px] bg-background px-3 py-0"
+                fieldClassName="min-h-10 rounded-[16px] px-3 py-0"
               >
                 <select
                   name="sort"

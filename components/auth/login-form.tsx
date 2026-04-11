@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { DEFAULT_SIGN_IN_REDIRECT_PATH } from "@/lib/auth-utils";
+import {
+  buildOAuthCallbackUrl,
+  DEFAULT_SIGN_IN_REDIRECT_PATH,
+  getSafeNextPath,
+  OAUTH_NEXT_COOKIE_NAME,
+} from "@/lib/auth-utils";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 
@@ -16,7 +21,12 @@ export function LoginForm({
   function handleGoogleSignIn() {
     startTransition(async () => {
       const supabase = createClient();
-      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
+      const safeNext = getSafeNextPath(next);
+      const redirectTo = buildOAuthCallbackUrl(window.location.origin);
+
+      document.cookie =
+        `${OAUTH_NEXT_COOKIE_NAME}=${encodeURIComponent(safeNext)}; Path=/; Max-Age=600; SameSite=Lax`;
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
@@ -41,6 +51,12 @@ export function LoginForm({
       >
         {isPending ? "Redirecting to Google..." : "Continue with Google"}
       </Button>
+
+      <div className="glass-surface-subtle rounded-[20px] px-4 py-3">
+        <p className="text-[var(--font-size-body-s)] leading-[1.5] text-muted">
+          You will be redirected to Google and returned to this workspace on the same origin after authentication.
+        </p>
+      </div>
 
       {message ? (
         <p className="text-[var(--font-size-body-s)] leading-[var(--line-height-body)] text-danger">

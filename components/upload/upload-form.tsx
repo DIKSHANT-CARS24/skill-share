@@ -197,14 +197,19 @@ function UploadFormContent({
   const hasDeleteError = deleteState.tone === "error";
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.92fr)]">
-      <Panel padding="lg">
+    <div className="grid gap-5 xl:grid-cols-[minmax(0,1.04fr)_minmax(360px,0.96fr)]">
+      <Panel padding="lg" className="relative overflow-hidden">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(71,54,254,0.08),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(255,192,223,0.08),transparent_32%)]" />
+        <div className="relative space-y-6">
         <div className="space-y-6">
-          <div className="space-y-2">
-            <h2 className="text-[var(--font-size-title-l)] leading-[var(--line-height-heading)] font-semibold text-foreground">
+          <div className="space-y-3">
+            <span className="glass-pill inline-flex items-center rounded-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-accent-strong">
+              {isEditMode ? "Revision Flow" : "Publishing Flow"}
+            </span>
+            <h2 className="text-[1.65rem] leading-[1.05] font-semibold tracking-[-0.03em] text-foreground">
               {formTitle}
             </h2>
-            <p className="text-[var(--font-size-body-m)] leading-[var(--line-height-body)] text-muted">
+            <p className="max-w-2xl text-[var(--font-size-body-m)] leading-[1.6] text-muted">
               {isEditMode
                 ? "The current skill metadata, version, and markdown are loaded below so you can edit them without rebuilding the entry from scratch."
                 : "Add the core metadata and markdown file for the first published version."}
@@ -282,7 +287,7 @@ function UploadFormContent({
                   tone: "subtle",
                   padding: "md",
                   className:
-                    "border-dashed px-5 py-6 shadow-none " +
+                    "border-dashed rounded-[24px] px-5 py-6 shadow-none " +
                     (clientFileError || markdownError ? "border-danger" : "border-border-strong"),
                 })}
               >
@@ -295,7 +300,7 @@ function UploadFormContent({
                   className="block w-full text-[var(--font-size-body-m)] leading-[var(--line-height-body)] text-muted file:mr-4 file:rounded-xl file:border-0 file:bg-accent file:px-4 file:py-2 file:text-[var(--font-size-label-m)] file:leading-[var(--line-height-body)] file:font-semibold file:text-white hover:file:bg-accent-strong"
                 />
                 {isEditMode && editSkill ? (
-                  <div className="mt-4 rounded-[16px] border border-border bg-surface px-4 py-3">
+                  <div className="glass-surface-subtle mt-4 rounded-[18px] px-4 py-3">
                     <p className="text-[var(--font-size-label-m)] leading-[var(--line-height-body)] font-semibold text-foreground">
                       Current file: {editSkill.currentFileName}
                     </p>
@@ -326,7 +331,7 @@ function UploadFormContent({
                 padding: "md",
                 className: hasServerError
                   ? "border-danger bg-danger-soft shadow-none"
-                  : "shadow-none",
+                  : "rounded-[22px] shadow-none",
               })}
             >
               <p className="text-[var(--font-size-body-s)] leading-[1.5] text-muted">
@@ -368,7 +373,7 @@ function UploadFormContent({
 
           {isEditMode && editSkill && canDeleteSkill ? (
             <form action={deleteFormAction} className="border-t border-border pt-6">
-              <div className="space-y-4 rounded-[16px] border border-danger/20 bg-danger-soft/70 px-5 py-5">
+              <div className="space-y-4 rounded-[24px] border border-danger/20 bg-[linear-gradient(180deg,rgba(255,239,241,0.84)_0%,rgba(255,239,241,0.62)_100%)] px-5 py-5 shadow-[0_20px_40px_rgba(180,35,24,0.08)]">
                 <div className="space-y-1">
                   <h3 className="text-[var(--font-size-heading-s)] leading-[var(--line-height-heading)] font-semibold text-foreground">
                     Delete skill
@@ -418,9 +423,12 @@ function UploadFormContent({
             </form>
           ) : null}
         </div>
+        </div>
       </Panel>
 
-      <MarkdownPreview title="Markdown preview" blocks={previewBlocks} />
+      <div className="xl:sticky xl:top-24 xl:h-fit">
+        <MarkdownPreview title="Markdown preview" blocks={previewBlocks} />
+      </div>
     </div>
   );
 }

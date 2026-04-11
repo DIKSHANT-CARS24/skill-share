@@ -47,17 +47,17 @@ export function SidebarNav({
             href={item.href}
             className={cx(
               variant === "topbar"
-                ? "rounded-[12px] border px-3 py-2 text-[var(--font-size-body-s)] leading-[var(--line-height-body)] font-semibold whitespace-nowrap transition-colors"
+                ? "rounded-full px-3.5 py-2 text-[var(--font-size-body-s)] leading-[var(--line-height-body)] font-semibold whitespace-nowrap transition-[background-color,border-color,box-shadow,color,transform] duration-200"
                 : compact
-                ? "rounded-[14px] border px-3 py-2.5 text-[var(--font-size-body-m)] leading-[var(--line-height-body)] font-semibold transition-colors"
-                : "rounded-2xl border px-4 py-3 text-[var(--font-size-label-m)] leading-[var(--line-height-body)] font-semibold transition-colors",
+                ? "rounded-[16px] px-3 py-2.5 text-[var(--font-size-body-m)] leading-[var(--line-height-body)] font-semibold transition-[background-color,border-color,box-shadow,color,transform] duration-200"
+                : "rounded-[18px] px-4 py-3 text-[var(--font-size-label-m)] leading-[var(--line-height-body)] font-semibold transition-[background-color,border-color,box-shadow,color,transform] duration-200",
               isActive
-                ? "border-accent/20 bg-accent-soft text-accent"
+                ? "glass-pill-active hover:-translate-y-0.5"
                 : variant === "topbar"
-                  ? "border-transparent text-muted hover:border-border hover:bg-surface-strong hover:text-foreground"
+                  ? "glass-pill text-muted hover:-translate-y-0.5 hover:text-foreground"
                   : compact
-                  ? "border-transparent text-muted hover:border-border hover:bg-surface-strong hover:text-foreground"
-                  : "border-transparent text-muted-strong hover:border-border hover:bg-surface",
+                    ? "glass-pill text-muted hover:-translate-y-0.5 hover:text-foreground"
+                    : "glass-pill text-muted-strong hover:-translate-y-0.5 hover:text-foreground",
             )}
           >
             {item.label}

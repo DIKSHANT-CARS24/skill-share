@@ -1,4 +1,5 @@
 export const DEFAULT_SIGN_IN_REDIRECT_PATH = "/skills";
+export const OAUTH_NEXT_COOKIE_NAME = "skill-share-oauth-next";
 
 export function isCarsEmail(email: string) {
   return email.trim().toLowerCase().endsWith("@cars24.com");
@@ -40,6 +41,10 @@ export function buildLoginRedirectPath(pathname: string, search = "") {
   }
 
   return `/login?next=${encodeURIComponent(nextPath)}`;
+}
+
+export function buildOAuthCallbackUrl(origin: string) {
+  return new URL("/auth/callback", origin).toString();
 }
 
 export function isSkillOwner(viewerUserId: string, skillUploaderId: string) {

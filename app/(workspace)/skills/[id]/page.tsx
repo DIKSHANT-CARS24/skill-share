@@ -34,7 +34,9 @@ export default async function SkillDetailPage({
   return (
     <div className="space-y-5 pb-6">
       <SkillSaveToast />
-      <Panel padding="lg" className="space-y-6">
+      <Panel padding="lg" className="relative overflow-hidden space-y-6">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(71,54,254,0.09),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(255,192,223,0.1),transparent_34%)]" />
+        <div className="relative space-y-6">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
@@ -57,6 +59,17 @@ export default async function SkillDetailPage({
                 {skill.description}
               </p>
             </div>
+            <div className="flex flex-wrap gap-2">
+              <span className="glass-pill rounded-full px-3 py-1.5 text-[12px] font-semibold text-foreground">
+                {formatNumber(skill.downloads ?? 0)} downloads
+              </span>
+              <span className="glass-pill rounded-full px-3 py-1.5 text-[12px] font-semibold text-foreground">
+                {skill.versionCount} versions
+              </span>
+              <span className="glass-pill rounded-full px-3 py-1.5 text-[12px] font-semibold text-foreground">
+                Updated {formatDate(skill.updatedAt)}
+              </span>
+            </div>
           </div>
 
           <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
@@ -70,13 +83,16 @@ export default async function SkillDetailPage({
             ) : null}
           </div>
         </div>
+        </div>
       </Panel>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.5fr)_360px]">
         <MarkdownPreview blocks={skill.markdownBlocks} />
 
         <div className="space-y-5">
-          <Panel padding="md">
+          <Panel padding="md" className="relative overflow-hidden">
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(71,54,254,0.08),transparent_32%)]" />
+            <div className="relative">
             <div className="flex items-start gap-4">
               <Avatar initials={getInitialsFromEmail(uploader.email)} size="lg" />
               <div className="min-w-0">
@@ -116,6 +132,7 @@ export default async function SkillDetailPage({
                 <dd className="font-medium text-foreground">{skill.versionCount}</dd>
               </div>
             </dl>
+            </div>
           </Panel>
 
           <VersionHistory versions={skill.versionHistory} />

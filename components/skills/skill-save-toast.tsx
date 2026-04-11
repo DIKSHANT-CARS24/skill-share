@@ -39,7 +39,7 @@ export function SkillSaveToast() {
       <div
         role="status"
         aria-live="polite"
-        className="rounded-[16px] border border-success/20 bg-success-soft px-4 py-3 text-[var(--font-size-body-m)] leading-[var(--line-height-body)] text-success shadow-[0_12px_30px_rgba(15,23,43,0.12)]"
+        className="rounded-[20px] border border-white/38 bg-[linear-gradient(180deg,rgba(239,255,247,0.92)_0%,rgba(239,255,247,0.74)_100%)] px-4 py-3 text-[var(--font-size-body-m)] leading-[var(--line-height-body)] text-success shadow-[0_18px_40px_rgba(15,23,43,0.12)] backdrop-blur-[18px]"
       >
         <p className="font-semibold">Details updated successfully</p>
       </div>

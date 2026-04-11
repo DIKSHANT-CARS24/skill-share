@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  buildOAuthCallbackUrl,
   DEFAULT_SIGN_IN_REDIRECT_PATH,
   buildLoginRedirectPath,
   getSafeNextPath,
@@ -36,6 +37,17 @@ test("buildLoginRedirectPath only adds next when needed", () => {
   assert.equal(
     buildLoginRedirectPath("/skills/intro-to-prompts", "?tab=versions"),
     "/login?next=%2Fskills%2Fintro-to-prompts%3Ftab%3Dversions",
+  );
+});
+
+test("buildOAuthCallbackUrl keeps the current runtime origin", () => {
+  assert.equal(
+    buildOAuthCallbackUrl("http://localhost:3000"),
+    "http://localhost:3000/auth/callback",
+  );
+  assert.equal(
+    buildOAuthCallbackUrl("https://skill-share.vercel.app"),
+    "https://skill-share.vercel.app/auth/callback",
   );
 });
 

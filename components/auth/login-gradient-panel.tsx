@@ -84,7 +84,7 @@ export function LoginGradientPanel() {
   return (
     <section
       ref={panelRef}
-      className="relative overflow-hidden rounded-[28px] border border-white/10 p-8 text-white shadow-[0_28px_80px_rgba(15,23,43,0.2)] sm:p-10 lg:min-h-[680px] lg:p-12"
+      className="relative overflow-hidden rounded-[32px] border border-white/20 p-8 text-white shadow-[0_36px_90px_rgba(15,23,43,0.24)] sm:p-10 lg:min-h-[720px] lg:p-12"
       style={{
         background: `
           radial-gradient(38rem 34rem at var(--login-pointer-x) var(--login-pointer-y), rgba(255,255,255,0.7) 0%, rgba(255,188,215,0.55) 8%, rgba(164,96,255,0.34) 22%, rgba(74,35,185,0.18) 40%, transparent 62%),
@@ -130,10 +130,12 @@ export function LoginGradientPanel() {
         }}
       />
 
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0)_24%,rgba(255,255,255,0.06)_100%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.08)_0%,rgba(255,255,255,0)_24%,rgba(255,255,255,0.08)_100%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.08),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(129,95,255,0.24),transparent_34%)]" />
+      <div className="pointer-events-none absolute inset-[1px] rounded-[31px] border border-white/12" />
 
-      <div className="relative flex h-full flex-col justify-start gap-6">
+      <div className="relative flex h-full flex-col justify-between gap-10">
+        <div className="space-y-6">
         <p className="text-[var(--font-size-label-s)] leading-[var(--line-height-body)] font-semibold uppercase tracking-[0.18em] text-white/72">
           Internal workspace
         </p>
@@ -144,6 +146,24 @@ export function LoginGradientPanel() {
           <p className="max-w-xl text-[var(--font-size-body-l)] leading-[1.55] text-white/82">
             One place to browse, review, and publish internal AI skills.
           </p>
+        </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="glass-surface-subtle rounded-[24px] px-5 py-5 text-white">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/62">Workspace</p>
+            <p className="mt-3 text-[1.15rem] font-semibold text-white">Catalog, review, versioning</p>
+            <p className="mt-2 text-[var(--font-size-body-s)] leading-[1.55] text-white/72">
+              Built for internal skill discovery with guarded access and readable change history.
+            </p>
+          </div>
+          <div className="glass-surface-subtle rounded-[24px] px-5 py-5 text-white">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/62">Visual Mode</p>
+            <p className="mt-3 text-[1.15rem] font-semibold text-white">Glass surfaces, soft depth</p>
+            <p className="mt-2 text-[var(--font-size-body-s)] leading-[1.55] text-white/72">
+              A local-first premium UI pass with preserved auth, routing, and data behavior.
+            </p>
+          </div>
         </div>
       </div>
     </section>

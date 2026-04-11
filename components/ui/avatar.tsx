@@ -19,7 +19,7 @@ export function Avatar({
   return (
     <div
       className={cx(
-        "inline-flex items-center justify-center rounded-2xl border border-accent/10 bg-accent-soft leading-none font-semibold text-accent",
+        "inline-flex items-center justify-center rounded-[20px] border border-white/52 bg-[linear-gradient(180deg,rgba(255,255,255,0.74)_0%,rgba(232,227,255,0.62)_100%)] leading-none font-semibold text-accent shadow-[0_16px_32px_rgba(71,54,254,0.16)] backdrop-blur-[18px]",
         sizeClass,
         className,
       )}
