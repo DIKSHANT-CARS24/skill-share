@@ -13,7 +13,7 @@
 
 The remaining `design` bug was caused by multiple places being slightly out of sync:
 
-- the frontend dropdown uses canonical category values like `design`, `development`, `product`, `finance`, and `operations`
+- the frontend dropdown uses canonical category values like `design`, `development`, `product`, `finance`, `operations`, and `marketing`
 - the backend category lookup was still validating those values against a narrower database query and a stricter raw-row matcher
 - that made `design` fail if the database row shape did not match the expected slug path exactly, even though the frontend treated it as a valid canonical category
 - after the failed submit, the edit form did not round-trip the submitted values back into client state, so the category field could appear cleared or reverted on the rerender
@@ -31,7 +31,7 @@ This issue was in multiple places:
 
 - `getValidCategory` now resolves canonical category values by reading category rows and matching against both `slug` and `name`, instead of depending on a narrower slug-only path.
 - `pickPreferredRawCategory` now treats `slug` and `name` as valid canonical match sources, so rows such as `Design` continue to resolve correctly even if the raw row shape is not ideal.
-- A follow-up migration now upserts the five canonical category rows so the database stays aligned with the canonical frontend taxonomy.
+- A follow-up migration now upserts the six canonical category rows so the database stays aligned with the canonical frontend taxonomy.
 
 ## How the category field now preserves its value correctly
 
@@ -59,7 +59,7 @@ This uses the same canonical category contract for both frontend and backend.
 3. Confirm you are redirected back to `/skills/[slug]`.
 4. Confirm the skill detail page shows the `Design` badge and metadata row.
 5. Reopen `/skills/[slug]/edit` and confirm `Design` is still selected.
-6. Repeat the same save flow for `Development`, `Product`, `Finance`, and `Operations`.
+6. Repeat the same save flow for `Development`, `Product`, `Finance`, `Operations`, and `Marketing`.
 7. Trigger a failed save if possible and confirm the category field keeps the submitted value instead of clearing.
 8. Edit only title, description, or version without changing category and confirm those still save normally.
 9. Create a new skill from `/upload` and confirm category selection and save still work.

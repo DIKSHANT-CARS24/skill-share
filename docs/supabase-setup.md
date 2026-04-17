@@ -89,6 +89,7 @@ Run every SQL file in `supabase/migrations` in timestamp order:
 4. [20260403090000_update_category_taxonomy.sql](/Users/a61813/Desktop/workspace/skill-share/supabase/migrations/20260403090000_update_category_taxonomy.sql)
 5. [20260403103000_fix_edit_skill_rls.sql](/Users/a61813/Desktop/workspace/skill-share/supabase/migrations/20260403103000_fix_edit_skill_rls.sql)
 6. [20260403113000_allow_decimal_versions.sql](/Users/a61813/Desktop/workspace/skill-share/supabase/migrations/20260403113000_allow_decimal_versions.sql)
+7. [20260417113000_add_marketing_category.sql](/Users/a61813/Desktop/workspace/skill-share/supabase/migrations/20260417113000_add_marketing_category.sql)
 
 You can do this either:
 
@@ -102,7 +103,7 @@ What these migrations do:
 - enable RLS on every exposed table
 - create the private `skills` storage bucket
 - add storage policies so only authenticated active org members can upload and download markdown files
-- seed 5 categories
+- seed 6 categories
 
 ## 6. Sign in once to create the first member row
 

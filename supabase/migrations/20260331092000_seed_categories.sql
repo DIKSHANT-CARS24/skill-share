@@ -4,6 +4,7 @@ values
   ('development', 'Development'),
   ('product', 'Product'),
   ('finance', 'Finance'),
-  ('operations', 'Operations')
+  ('operations', 'Operations'),
+  ('marketing', 'Marketing')
 on conflict (slug) do update
 set name = excluded.name;

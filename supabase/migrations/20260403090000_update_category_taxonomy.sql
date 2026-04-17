@@ -6,7 +6,8 @@ values
   ('development', 'Development'),
   ('product', 'Product'),
   ('finance', 'Finance'),
-  ('operations', 'Operations')
+  ('operations', 'Operations'),
+  ('marketing', 'Marketing')
 on conflict (slug) do update
 set name = excluded.name;
 
@@ -39,6 +40,6 @@ where public.skill_categories.category_id = public.categories.id
   and public.categories.slug in ('engineering', 'customer-support', 'people-ops', 'people');
 
 delete from public.categories
-where slug not in ('design', 'development', 'product', 'finance', 'operations');
+where slug not in ('design', 'development', 'product', 'finance', 'operations', 'marketing');
 
 commit;

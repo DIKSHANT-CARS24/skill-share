@@ -1,6 +1,12 @@
 import type { Category } from "@/lib/types";
 
-type CanonicalCategoryId = "design" | "development" | "product" | "finance" | "operations";
+type CanonicalCategoryId =
+  | "design"
+  | "development"
+  | "product"
+  | "finance"
+  | "operations"
+  | "marketing";
 
 type CategoryRowLike = {
   id: string;
@@ -39,6 +45,12 @@ const CANONICAL_CATEGORIES: Category[] = [
     name: "Operations",
     description: "Process design, support operations, and workflow automation prompts.",
   },
+  {
+    id: "marketing",
+    slug: "marketing",
+    name: "Marketing",
+    description: "Campaign planning, copy review, and growth workflow prompts.",
+  },
 ];
 
 const CANONICAL_LOOKUP = new Map(
@@ -51,6 +63,7 @@ const CATEGORY_ALIASES: Record<CanonicalCategoryId, string[]> = {
   product: ["product", "people-ops", "people"],
   finance: ["finance"],
   operations: ["operations", "customer-support"],
+  marketing: ["marketing"],
 };
 
 function normalizeToken(value: string) {

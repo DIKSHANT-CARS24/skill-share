@@ -35,6 +35,11 @@ export const categories: Category[] = [
     name: "Operations",
     description: "Process design, support operations, and workflow automation prompts.",
   },
+  {
+    id: "marketing",
+    name: "Marketing",
+    description: "Campaign planning, copy review, and growth workflow prompts.",
+  },
 ];
 
 export const uploaders: Uploader[] = [

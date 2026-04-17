@@ -3,11 +3,15 @@
 ## Exact files changed
 
 - `docs/data/category-taxonomy-update.md`
-- `lib/constants.ts`
+- `docs/supabase-setup.md`
+- `docs/ui-redesign/edit-skill/category-bug-fix-notes.md`
+- `lib/category-taxonomy.test.ts`
+- `lib/category-taxonomy.ts`
 - `lib/mock-data.ts`
-- `lib/skills.test.ts`
 - `supabase/migrations/20260331092000_seed_categories.sql`
 - `supabase/migrations/20260403090000_update_category_taxonomy.sql`
+- `supabase/migrations/20260403123000_ensure_canonical_categories.sql`
+- `supabase/migrations/20260417113000_add_marketing_category.sql`
 
 ## Final canonical category list
 
@@ -16,21 +20,15 @@
 - `product`
 - `finance`
 - `operations`
+- `marketing`
 
-## Old-to-new category mapping
+## Manual Supabase migration
 
-- `Engineering` -> `Development`
-- `Finance` -> `Finance`
-- `Operations` -> `Operations`
-- `People Ops` -> `Product`
-- `Customer Support` -> `Operations`
+Yes. Existing deployed databases need [20260417113000_add_marketing_category.sql](/Users/a61813/Desktop/workspace/skill-share/supabase/migrations/20260417113000_add_marketing_category.sql) applied.
 
-## Skills that needed judgment-based reassignment
+Fresh environments that run the full migration chain will also receive `marketing` because the historical seed and canonical-category migrations were updated.
 
-- `Launch Readiness Check`
-  Moved from `Operations` to `Product` in the mock/sample data because the title and description are explicitly centred on PMs, release managers, and launch readiness decisions.
-
-## UI coverage
+## What changed
 
 - The canonical category set now flows through the shared category data used by:
   - catalog filters
@@ -40,7 +38,19 @@
   - upload and edit form dropdowns
   - empty/loading/no-results preview states backed by mock data
 
-- The database seed now inserts only the five canonical categories.
-- The follow-up migration remaps existing `skill_categories` rows from the retired categories into the new canonical set and removes the retired category rows.
-- The app also normalizes legacy category rows at read time so pages and filters render only the canonical five even before every existing database environment has applied the remap migration.
-- Sample constants and tests that depended on the old taxonomy were updated to the new category names and ids.
+- The database seed now inserts the six canonical categories.
+- The historical canonical-category migrations were updated so clean setups stay aligned with the app taxonomy.
+- A new forward-only migration adds `marketing` to already-deployed Supabase databases.
+- The app still normalizes legacy rows such as `engineering` and `customer-support` into the canonical frontend taxonomy.
+
+## Manual tests to run
+
+1. Apply the new Supabase migration in the target environment.
+2. Open `/skills` and confirm category filter dropdowns include `Marketing`.
+3. Open `/upload` and confirm the category selector includes `Marketing`.
+4. Open `/skills/[id]/edit` and confirm the category selector includes `Marketing`.
+5. Create or edit a skill to use `Marketing`, then verify:
+   - the catalog card badge shows `Marketing`
+   - the skill detail badge shows `Marketing`
+   - profile/category chips show `Marketing`
+6. Confirm search/filter URL behavior still works when `category=marketing`.
