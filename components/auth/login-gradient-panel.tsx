@@ -134,34 +134,17 @@ export function LoginGradientPanel() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.08),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(129,95,255,0.24),transparent_34%)]" />
       <div className="pointer-events-none absolute inset-[1px] rounded-[31px] border border-white/12" />
 
-      <div className="relative flex h-full flex-col justify-between gap-10">
+      <div className="relative flex h-full min-h-[520px] flex-col justify-center gap-10 py-8 sm:py-10 lg:min-h-[640px] lg:py-12">
         <div className="space-y-6">
-        <p className="text-[var(--font-size-label-s)] leading-[var(--line-height-body)] font-semibold uppercase tracking-[0.18em] text-white/72">
-          Internal workspace
-        </p>
-        <div className="space-y-5">
-          <h1 className="max-w-[10ch] text-[2.75rem] leading-[0.98] font-semibold tracking-[-0.04em] text-balance text-white drop-shadow-[0_8px_24px_rgba(3,2,9,0.35)] sm:text-[3.75rem] lg:text-[4.5rem]">
-            skill-share
-          </h1>
-          <p className="max-w-xl text-[var(--font-size-body-l)] leading-[1.55] text-white/82">
-            One place to browse, review, and publish internal AI skills.
+          <p className="text-[var(--font-size-label-s)] leading-[var(--line-height-body)] font-semibold uppercase tracking-[0.18em] text-white/72">
+            Internal workspace
           </p>
-        </div>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="glass-surface-subtle rounded-[24px] px-5 py-5 text-white">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/62">Workspace</p>
-            <p className="mt-3 text-[1.15rem] font-semibold text-white">Catalog, review, versioning</p>
-            <p className="mt-2 text-[var(--font-size-body-s)] leading-[1.55] text-white/72">
-              Built for internal skill discovery with guarded access and readable change history.
-            </p>
-          </div>
-          <div className="glass-surface-subtle rounded-[24px] px-5 py-5 text-white">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/62">Visual Mode</p>
-            <p className="mt-3 text-[1.15rem] font-semibold text-white">Glass surfaces, soft depth</p>
-            <p className="mt-2 text-[var(--font-size-body-s)] leading-[1.55] text-white/72">
-              A local-first premium UI pass with preserved auth, routing, and data behavior.
+          <div className="space-y-5">
+            <h1 className="max-w-[10ch] text-[2.75rem] leading-[0.98] font-semibold tracking-[-0.04em] text-balance text-white drop-shadow-[0_8px_24px_rgba(3,2,9,0.35)] sm:text-[3.75rem] lg:text-[4.5rem]">
+              skill-share
+            </h1>
+            <p className="max-w-xl text-[var(--font-size-body-l)] leading-[1.55] text-white/82">
+              One place to browse, review, and publish internal AI skills.
             </p>
           </div>
         </div>

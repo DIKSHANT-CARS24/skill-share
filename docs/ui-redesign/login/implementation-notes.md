@@ -3,23 +3,22 @@
 ## Exact files changed
 
 - `app/login/page.tsx`
+- `components/auth/login-gradient-panel.tsx`
 - `docs/ui-redesign/login/implementation-notes.md`
 
-## How the CTA spacing was corrected
+## What was removed from the left panel
 
-- Removed the narrow max-width wrapper that was making the right-panel action area feel left-weighted.
-- Let the right-panel action stack use the full available inner panel width so the primary CTA now inherits the same inset from the left and right panel edges.
-- Kept the existing Google OAuth flow and CTA copy unchanged.
+- Removed the lower `Workspace` glass box.
+- Removed the lower `Visual mode` glass box.
 
-## How the supporting sentence was kept to one line
+## What was removed from the right panel
 
-- Split the heading copy block from the full-width action area.
-- Gave the text block a slightly wider desktop max width and applied desktop-only no-wrap behavior to:
-  `Sign in with your Cars24 Google Workspace account to continue.`
-- This keeps the sentence on one line at the intended login layout width without changing the copy.
+- Removed the lower `Access` glass box.
+- Removed the lower `Permissions` glass box.
+- Removed the lower `Routing` glass box.
 
-## Small right-panel layout adjustments
+## Spacing and alignment adjustments
 
-- Kept the right panel anchored from the top-left.
-- Separated the text block from the CTA block so the copy can stay visually controlled while the button spans the full inner content width.
-- Preserved the left panel and the overall visual direction.
+- Recentered the left panel content vertically after removing the lower row of glass cards.
+- Recentered the right panel content stack so the headline, supporting sentence, and Google CTA stay visually balanced without the lower info-card row.
+- Kept the two-panel layout, the glassmorphic direction, and the existing Google OAuth flow unchanged.
