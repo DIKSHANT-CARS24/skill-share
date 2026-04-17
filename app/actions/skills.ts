@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { isSkillOwner, requireActiveMember } from "@/lib/auth";
 import {
+  getCanonicalCategoryById,
   getCanonicalCategoryFromRow,
   normalizeCategoryValue,
   pickPreferredRawCategory,
@@ -68,6 +69,9 @@ type RawCategoryRow = {
   name?: string | null;
 };
 
+const MARKETING_CATEGORY_MIGRATION =
+  "supabase/migrations/20260417113000_add_marketing_category.sql";
+
 function slugify(value: string) {
   const slug = value
     .trim()
@@ -101,6 +105,21 @@ function createResponse(
     tone: "error",
     fieldValues,
   };
+}
+
+function createMissingCanonicalCategoryResponse(canonicalCategoryId: string) {
+  const category = getCanonicalCategoryById(canonicalCategoryId);
+
+  if (!category) {
+    return createResponse("Choose a valid category before saving.");
+  }
+
+  return createResponse(
+    `${category.name} is selectable in the UI, but it is not available in the database yet.`,
+    [
+      `Apply ${MARKETING_CATEGORY_MIGRATION}, then try again.`,
+    ],
+  );
 }
 
 function createCategorySaveFailureResponse(detail: string) {
@@ -229,6 +248,13 @@ async function getValidCategory(
   }
 
   if (!category) {
+    if (normalizedCategoryId) {
+      return {
+        category: null,
+        response: createMissingCanonicalCategoryResponse(normalizedCategoryId),
+      };
+    }
+
     return {
       category: null,
       response: createResponse("Choose a valid category before saving."),
